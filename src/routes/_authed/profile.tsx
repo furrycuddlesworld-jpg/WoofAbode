@@ -16,7 +16,6 @@ export const Route = createFileRoute("/_authed/profile")({
 });
 
 const FIELDS = [
-  "full_name",
   "phone",
   "whatsapp",
   "address",
@@ -35,9 +34,10 @@ function ProfilePage() {
 }
 
 function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => Promise<void> }) {
-  const [form, setForm] = useState<Record<string, string>>(() =>
-    Object.fromEntries(FIELDS.map((k) => [k, (profile[k] as string | null) ?? ""])),
-  );
+  const [form, setForm] = useState<Record<string, string>>(() => ({
+    full_name: profile.full_name,
+    ...Object.fromEntries(FIELDS.map((k) => [k, (profile[k] as string | null) ?? ""])),
+  }));
   const [optIn, setOptIn] = useState(profile.whatsapp_opt_in);
   const [busy, setBusy] = useState(false);
   const set = (k: string) => (e: { target: { value: string } }) =>
