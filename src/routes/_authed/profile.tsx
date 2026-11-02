@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesUpdate } from "@/integrations/supabase/types";
 import { useAuth } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 
@@ -15,7 +16,6 @@ export const Route = createFileRoute("/_authed/profile")({
 });
 
 const FIELDS = [
-  "full_name",
   "phone",
   "whatsapp",
   "address",
@@ -34,9 +34,10 @@ function ProfilePage() {
 }
 
 function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => Promise<void> }) {
-  const [form, setForm] = useState<Record<string, string>>(() =>
-    Object.fromEntries(FIELDS.map((k) => [k, (profile[k] as string | null) ?? ""])),
-  );
+  const [form, setForm] = useState<Record<string, string>>(() => ({
+    full_name: profile.full_name,
+    ...Object.fromEntries(FIELDS.map((k) => [k, (profile[k] as string | null) ?? ""])),
+  }));
   const [optIn, setOptIn] = useState(profile.whatsapp_opt_in);
   const [busy, setBusy] = useState(false);
   const set = (k: string) => (e: { target: { value: string } }) =>
@@ -46,7 +47,7 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => Pr
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const row: Record<string, string | boolean | null> = { whatsapp_opt_in: optIn };
+    const row: TablesUpdate<"profiles"> = { whatsapp_opt_in: optIn };
     for (const k of FIELDS) row[k] = get(k).trim() || null;
     row["full_name"] = get("full_name").trim();
     const { error } = await supabase.from("profiles").update(row).eq("id", profile.id);
