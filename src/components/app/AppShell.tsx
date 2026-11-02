@@ -17,6 +17,7 @@ const PARENT_NAV = [
 
 const ADMIN_NAV = [
   { to: "/admin", label: "Today" },
+  { to: "/admin/attendance", label: "Attendance" },
   { to: "/admin/schedule", label: "Schedule" },
   { to: "/admin/dogs", label: "Dogs" },
   { to: "/admin/people", label: "People" },

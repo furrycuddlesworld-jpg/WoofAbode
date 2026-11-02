@@ -161,3 +161,33 @@ function numericRate(r: Rate): Rate {
     same_day_rate: n(r.same_day_rate),
   };
 }
+
+/**
+ * Month-end: creates or refreshes the bill of every parent whose dog came for day boarding
+ * in `month`. Returns how many bills have charges, plus any warnings.
+ */
+export async function closeMonth(
+  month: string,
+): Promise<{ made: number; warnings: string[]; error?: string }> {
+  const { data, error } = await supabase
+    .from("day_boarding")
+    .select("dog_id, dogs!inner(owner_id)")
+    .eq("status", "present")
+    .gte("date", firstDayOfMonth(month))
+    .lte("date", lastDayOfMonth(month));
+  if (error) return { made: 0, warnings: [], error: error.message };
+  const parents = new Set<string>();
+  for (const row of (data ?? []) as unknown as { dogs: { owner_id: string | null } }[]) {
+    if (row.dogs?.owner_id) parents.add(row.dogs.owner_id);
+  }
+  let made = 0;
+  const warnings: string[] = [];
+  for (const pid of parents) {
+    const res = await generateBill(pid, month);
+    if (res.ok) {
+      made += 1;
+      warnings.push(...res.warnings);
+    }
+  }
+  return { made, warnings };
+}

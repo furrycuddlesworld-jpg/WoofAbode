@@ -17,6 +17,7 @@ import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
 import { Route as AuthedNotificationsRouteImport } from './routes/_authed/notifications'
 import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
+import { Route as AuthedAdminAttendanceRouteImport } from './routes/_authed/admin/attendance'
 import { Route as AuthedAdminBillsRouteImport } from './routes/_authed/admin/bills'
 import { Route as AuthedAdminDogsRouteImport } from './routes/_authed/admin/dogs'
 import { Route as AuthedAdminHealthRouteImport } from './routes/_authed/admin/health'
@@ -68,6 +69,11 @@ const AuthedProfileRoute = AuthedProfileRouteImport.update({
 const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminAttendanceRoute = AuthedAdminAttendanceRouteImport.update({
+  id: '/admin/attendance',
+  path: '/admin/attendance',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedAdminBillsRoute = AuthedAdminBillsRouteImport.update({
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthedHomeRoute
   '/notifications': typeof AuthedNotificationsRoute
   '/profile': typeof AuthedProfileRoute
+  '/admin/attendance': typeof AuthedAdminAttendanceRoute
   '/admin/bills': typeof AuthedAdminBillsRoute
   '/admin/dogs': typeof AuthedAdminDogsRoute
   '/admin/health': typeof AuthedAdminHealthRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/home': typeof AuthedHomeRoute
   '/notifications': typeof AuthedNotificationsRoute
   '/profile': typeof AuthedProfileRoute
+  '/admin/attendance': typeof AuthedAdminAttendanceRoute
   '/admin/bills': typeof AuthedAdminBillsRoute
   '/admin/dogs': typeof AuthedAdminDogsRoute
   '/admin/health': typeof AuthedAdminHealthRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/_authed/home': typeof AuthedHomeRoute
   '/_authed/notifications': typeof AuthedNotificationsRoute
   '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/admin/attendance': typeof AuthedAdminAttendanceRoute
   '/_authed/admin/bills': typeof AuthedAdminBillsRoute
   '/_authed/admin/dogs': typeof AuthedAdminDogsRoute
   '/_authed/admin/health': typeof AuthedAdminHealthRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/notifications'
     | '/profile'
+    | '/admin/attendance'
     | '/admin/bills'
     | '/admin/dogs'
     | '/admin/health'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/notifications'
     | '/profile'
+    | '/admin/attendance'
     | '/admin/bills'
     | '/admin/dogs'
     | '/admin/health'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/_authed/home'
     | '/_authed/notifications'
     | '/_authed/profile'
+    | '/_authed/admin/attendance'
     | '/_authed/admin/bills'
     | '/_authed/admin/dogs'
     | '/_authed/admin/health'
@@ -337,6 +349,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthedAdminIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/attendance': {
+      id: '/_authed/admin/attendance'
+      path: '/admin/attendance'
+      fullPath: '/admin/attendance'
+      preLoaderRoute: typeof AuthedAdminAttendanceRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/admin/bills': {
@@ -437,6 +456,7 @@ interface AuthedRouteChildren {
   AuthedHomeRoute: typeof AuthedHomeRoute
   AuthedNotificationsRoute: typeof AuthedNotificationsRoute
   AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedAdminAttendanceRoute: typeof AuthedAdminAttendanceRoute
   AuthedAdminBillsRoute: typeof AuthedAdminBillsRoute
   AuthedAdminDogsRoute: typeof AuthedAdminDogsRoute
   AuthedAdminHealthRoute: typeof AuthedAdminHealthRoute
@@ -457,6 +477,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedHomeRoute: AuthedHomeRoute,
   AuthedNotificationsRoute: AuthedNotificationsRoute,
   AuthedProfileRoute: AuthedProfileRoute,
+  AuthedAdminAttendanceRoute: AuthedAdminAttendanceRoute,
   AuthedAdminBillsRoute: AuthedAdminBillsRoute,
   AuthedAdminDogsRoute: AuthedAdminDogsRoute,
   AuthedAdminHealthRoute: AuthedAdminHealthRoute,
