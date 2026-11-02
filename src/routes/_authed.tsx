@@ -2,7 +2,7 @@ import { createFileRoute, Navigate, Outlet, useRouterState } from "@tanstack/rea
 
 import { AppShell } from "@/components/app/AppShell";
 import { Loading } from "@/components/app/Common";
-import { isSupabaseConfigured } from "@/integrations/supabase/client";
+import { isSupabaseConfigured } from "@/integrations/supabase/configured";
 import { useAuth } from "@/lib/auth";
 
 // Every page inside this layout needs a signed-in user. Pages under /admin also need the admin role.

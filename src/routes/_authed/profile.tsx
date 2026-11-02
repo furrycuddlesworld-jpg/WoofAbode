@@ -46,7 +46,7 @@ function ProfileForm({ profile, onSaved }: { profile: Profile; onSaved: () => Pr
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const row: Record<string, string | boolean | null> = { whatsapp_opt_in: optIn };
+    const row: TablesUpdate<"profiles"> = { whatsapp_opt_in: optIn };
     for (const k of FIELDS) row[k] = get(k).trim() || null;
     row["full_name"] = get("full_name").trim();
     const { error } = await supabase.from("profiles").update(row).eq("id", profile.id);

@@ -187,7 +187,7 @@ function ImportPage() {
           dog_id: (dog as Dog).id,
           planned_start: r.check_in,
           planned_end: r.check_out,
-          status: "completed",
+          status: "completed" as const,
           imported: true,
           imported_amount: r.amount,
           imported_paid: r.paid,
