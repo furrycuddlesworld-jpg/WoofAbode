@@ -10,33 +10,275 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
+import { Route as AuthedNotificationsRouteImport } from './routes/_authed/notifications'
+import { Route as AuthedProfileRouteImport } from './routes/_authed/profile'
+import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
+import { Route as AuthedAdminBillsRouteImport } from './routes/_authed/admin/bills'
+import { Route as AuthedAdminDogsRouteImport } from './routes/_authed/admin/dogs'
+import { Route as AuthedAdminHealthRouteImport } from './routes/_authed/admin/health'
+import { Route as AuthedAdminImportRouteImport } from './routes/_authed/admin/import'
+import { Route as AuthedAdminPeopleRouteImport } from './routes/_authed/admin/people'
+import { Route as AuthedAdminRequestsRouteImport } from './routes/_authed/admin/requests'
+import { Route as AuthedAdminScheduleRouteImport } from './routes/_authed/admin/schedule'
+import { Route as AuthedAdminSettingsRouteImport } from './routes/_authed/admin/settings'
+import { Route as AuthedBillsIndexRouteImport } from './routes/_authed/bills/index'
+import { Route as AuthedBillsBillIdRouteImport } from './routes/_authed/bills/$billId'
+import { Route as AuthedDogsIndexRouteImport } from './routes/_authed/dogs/index'
+import { Route as AuthedDogsDogIdRouteImport } from './routes/_authed/dogs/$dogId'
+import { Route as AuthedDogsNewRouteImport } from './routes/_authed/dogs/new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedHomeRoute = AuthedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedNotificationsRoute = AuthedNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProfileRoute = AuthedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminBillsRoute = AuthedAdminBillsRouteImport.update({
+  id: '/admin/bills',
+  path: '/admin/bills',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminDogsRoute = AuthedAdminDogsRouteImport.update({
+  id: '/admin/dogs',
+  path: '/admin/dogs',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminHealthRoute = AuthedAdminHealthRouteImport.update({
+  id: '/admin/health',
+  path: '/admin/health',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminImportRoute = AuthedAdminImportRouteImport.update({
+  id: '/admin/import',
+  path: '/admin/import',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminPeopleRoute = AuthedAdminPeopleRouteImport.update({
+  id: '/admin/people',
+  path: '/admin/people',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminRequestsRoute = AuthedAdminRequestsRouteImport.update({
+  id: '/admin/requests',
+  path: '/admin/requests',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminScheduleRoute = AuthedAdminScheduleRouteImport.update({
+  id: '/admin/schedule',
+  path: '/admin/schedule',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAdminSettingsRoute = AuthedAdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedBillsIndexRoute = AuthedBillsIndexRouteImport.update({
+  id: '/bills/',
+  path: '/bills/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedBillsBillIdRoute = AuthedBillsBillIdRouteImport.update({
+  id: '/bills/$billId',
+  path: '/bills/$billId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDogsIndexRoute = AuthedDogsIndexRouteImport.update({
+  id: '/dogs/',
+  path: '/dogs/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDogsDogIdRoute = AuthedDogsDogIdRouteImport.update({
+  id: '/dogs/$dogId',
+  path: '/dogs/$dogId',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedDogsNewRoute = AuthedDogsNewRouteImport.update({
+  id: '/dogs/new',
+  path: '/dogs/new',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/home': typeof AuthedHomeRoute
+  '/notifications': typeof AuthedNotificationsRoute
+  '/profile': typeof AuthedProfileRoute
+  '/admin/bills': typeof AuthedAdminBillsRoute
+  '/admin/dogs': typeof AuthedAdminDogsRoute
+  '/admin/health': typeof AuthedAdminHealthRoute
+  '/admin/import': typeof AuthedAdminImportRoute
+  '/admin/people': typeof AuthedAdminPeopleRoute
+  '/admin/requests': typeof AuthedAdminRequestsRoute
+  '/admin/schedule': typeof AuthedAdminScheduleRoute
+  '/admin/settings': typeof AuthedAdminSettingsRoute
+  '/bills/$billId': typeof AuthedBillsBillIdRoute
+  '/dogs/$dogId': typeof AuthedDogsDogIdRoute
+  '/dogs/new': typeof AuthedDogsNewRoute
+  '/admin/': typeof AuthedAdminIndexRoute
+  '/bills/': typeof AuthedBillsIndexRoute
+  '/dogs/': typeof AuthedDogsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/home': typeof AuthedHomeRoute
+  '/notifications': typeof AuthedNotificationsRoute
+  '/profile': typeof AuthedProfileRoute
+  '/admin/bills': typeof AuthedAdminBillsRoute
+  '/admin/dogs': typeof AuthedAdminDogsRoute
+  '/admin/health': typeof AuthedAdminHealthRoute
+  '/admin/import': typeof AuthedAdminImportRoute
+  '/admin/people': typeof AuthedAdminPeopleRoute
+  '/admin/requests': typeof AuthedAdminRequestsRoute
+  '/admin/schedule': typeof AuthedAdminScheduleRoute
+  '/admin/settings': typeof AuthedAdminSettingsRoute
+  '/bills/$billId': typeof AuthedBillsBillIdRoute
+  '/dogs/$dogId': typeof AuthedDogsDogIdRoute
+  '/dogs/new': typeof AuthedDogsNewRoute
+  '/admin': typeof AuthedAdminIndexRoute
+  '/bills': typeof AuthedBillsIndexRoute
+  '/dogs': typeof AuthedDogsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authed/home': typeof AuthedHomeRoute
+  '/_authed/notifications': typeof AuthedNotificationsRoute
+  '/_authed/profile': typeof AuthedProfileRoute
+  '/_authed/admin/bills': typeof AuthedAdminBillsRoute
+  '/_authed/admin/dogs': typeof AuthedAdminDogsRoute
+  '/_authed/admin/health': typeof AuthedAdminHealthRoute
+  '/_authed/admin/import': typeof AuthedAdminImportRoute
+  '/_authed/admin/people': typeof AuthedAdminPeopleRoute
+  '/_authed/admin/requests': typeof AuthedAdminRequestsRoute
+  '/_authed/admin/schedule': typeof AuthedAdminScheduleRoute
+  '/_authed/admin/settings': typeof AuthedAdminSettingsRoute
+  '/_authed/bills/$billId': typeof AuthedBillsBillIdRoute
+  '/_authed/dogs/$dogId': typeof AuthedDogsDogIdRoute
+  '/_authed/dogs/new': typeof AuthedDogsNewRoute
+  '/_authed/admin/': typeof AuthedAdminIndexRoute
+  '/_authed/bills/': typeof AuthedBillsIndexRoute
+  '/_authed/dogs/': typeof AuthedDogsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/reset-password'
+    | '/home'
+    | '/notifications'
+    | '/profile'
+    | '/admin/bills'
+    | '/admin/dogs'
+    | '/admin/health'
+    | '/admin/import'
+    | '/admin/people'
+    | '/admin/requests'
+    | '/admin/schedule'
+    | '/admin/settings'
+    | '/bills/$billId'
+    | '/dogs/$dogId'
+    | '/dogs/new'
+    | '/admin/'
+    | '/bills/'
+    | '/dogs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/reset-password'
+    | '/home'
+    | '/notifications'
+    | '/profile'
+    | '/admin/bills'
+    | '/admin/dogs'
+    | '/admin/health'
+    | '/admin/import'
+    | '/admin/people'
+    | '/admin/requests'
+    | '/admin/schedule'
+    | '/admin/settings'
+    | '/bills/$billId'
+    | '/dogs/$dogId'
+    | '/dogs/new'
+    | '/admin'
+    | '/bills'
+    | '/dogs'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/login'
+    | '/reset-password'
+    | '/_authed/home'
+    | '/_authed/notifications'
+    | '/_authed/profile'
+    | '/_authed/admin/bills'
+    | '/_authed/admin/dogs'
+    | '/_authed/admin/health'
+    | '/_authed/admin/import'
+    | '/_authed/admin/people'
+    | '/_authed/admin/requests'
+    | '/_authed/admin/schedule'
+    | '/_authed/admin/settings'
+    | '/_authed/bills/$billId'
+    | '/_authed/dogs/$dogId'
+    | '/_authed/dogs/new'
+    | '/_authed/admin/'
+    | '/_authed/bills/'
+    | '/_authed/dogs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +290,197 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/home': {
+      id: '/_authed/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AuthedHomeRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/notifications': {
+      id: '/_authed/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthedNotificationsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/profile': {
+      id: '/_authed/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthedProfileRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/': {
+      id: '/_authed/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthedAdminIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/bills': {
+      id: '/_authed/admin/bills'
+      path: '/admin/bills'
+      fullPath: '/admin/bills'
+      preLoaderRoute: typeof AuthedAdminBillsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/dogs': {
+      id: '/_authed/admin/dogs'
+      path: '/admin/dogs'
+      fullPath: '/admin/dogs'
+      preLoaderRoute: typeof AuthedAdminDogsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/health': {
+      id: '/_authed/admin/health'
+      path: '/admin/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AuthedAdminHealthRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/import': {
+      id: '/_authed/admin/import'
+      path: '/admin/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AuthedAdminImportRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/people': {
+      id: '/_authed/admin/people'
+      path: '/admin/people'
+      fullPath: '/admin/people'
+      preLoaderRoute: typeof AuthedAdminPeopleRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/requests': {
+      id: '/_authed/admin/requests'
+      path: '/admin/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AuthedAdminRequestsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/schedule': {
+      id: '/_authed/admin/schedule'
+      path: '/admin/schedule'
+      fullPath: '/admin/schedule'
+      preLoaderRoute: typeof AuthedAdminScheduleRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/admin/settings': {
+      id: '/_authed/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthedAdminSettingsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/bills/': {
+      id: '/_authed/bills/'
+      path: '/bills'
+      fullPath: '/bills/'
+      preLoaderRoute: typeof AuthedBillsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/bills/$billId': {
+      id: '/_authed/bills/$billId'
+      path: '/bills/$billId'
+      fullPath: '/bills/$billId'
+      preLoaderRoute: typeof AuthedBillsBillIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dogs/': {
+      id: '/_authed/dogs/'
+      path: '/dogs'
+      fullPath: '/dogs/'
+      preLoaderRoute: typeof AuthedDogsIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dogs/$dogId': {
+      id: '/_authed/dogs/$dogId'
+      path: '/dogs/$dogId'
+      fullPath: '/dogs/$dogId'
+      preLoaderRoute: typeof AuthedDogsDogIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/dogs/new': {
+      id: '/_authed/dogs/new'
+      path: '/dogs/new'
+      fullPath: '/dogs/new'
+      preLoaderRoute: typeof AuthedDogsNewRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
+interface AuthedRouteChildren {
+  AuthedHomeRoute: typeof AuthedHomeRoute
+  AuthedNotificationsRoute: typeof AuthedNotificationsRoute
+  AuthedProfileRoute: typeof AuthedProfileRoute
+  AuthedAdminBillsRoute: typeof AuthedAdminBillsRoute
+  AuthedAdminDogsRoute: typeof AuthedAdminDogsRoute
+  AuthedAdminHealthRoute: typeof AuthedAdminHealthRoute
+  AuthedAdminImportRoute: typeof AuthedAdminImportRoute
+  AuthedAdminPeopleRoute: typeof AuthedAdminPeopleRoute
+  AuthedAdminRequestsRoute: typeof AuthedAdminRequestsRoute
+  AuthedAdminScheduleRoute: typeof AuthedAdminScheduleRoute
+  AuthedAdminSettingsRoute: typeof AuthedAdminSettingsRoute
+  AuthedBillsBillIdRoute: typeof AuthedBillsBillIdRoute
+  AuthedDogsDogIdRoute: typeof AuthedDogsDogIdRoute
+  AuthedDogsNewRoute: typeof AuthedDogsNewRoute
+  AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
+  AuthedBillsIndexRoute: typeof AuthedBillsIndexRoute
+  AuthedDogsIndexRoute: typeof AuthedDogsIndexRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedHomeRoute: AuthedHomeRoute,
+  AuthedNotificationsRoute: AuthedNotificationsRoute,
+  AuthedProfileRoute: AuthedProfileRoute,
+  AuthedAdminBillsRoute: AuthedAdminBillsRoute,
+  AuthedAdminDogsRoute: AuthedAdminDogsRoute,
+  AuthedAdminHealthRoute: AuthedAdminHealthRoute,
+  AuthedAdminImportRoute: AuthedAdminImportRoute,
+  AuthedAdminPeopleRoute: AuthedAdminPeopleRoute,
+  AuthedAdminRequestsRoute: AuthedAdminRequestsRoute,
+  AuthedAdminScheduleRoute: AuthedAdminScheduleRoute,
+  AuthedAdminSettingsRoute: AuthedAdminSettingsRoute,
+  AuthedBillsBillIdRoute: AuthedBillsBillIdRoute,
+  AuthedDogsDogIdRoute: AuthedDogsDogIdRoute,
+  AuthedDogsNewRoute: AuthedDogsNewRoute,
+  AuthedAdminIndexRoute: AuthedAdminIndexRoute,
+  AuthedBillsIndexRoute: AuthedBillsIndexRoute,
+  AuthedDogsIndexRoute: AuthedDogsIndexRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
