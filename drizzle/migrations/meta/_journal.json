@@ -15,6 +15,13 @@
       "when": 1793609706653,
       "tag": "0001_woofabode_grants_and_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793610919836,
+      "tag": "0002_admin_grants",
+      "breakpoints": true
     }
   ]
 }
