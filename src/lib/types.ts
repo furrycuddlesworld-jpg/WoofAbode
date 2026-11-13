@@ -21,6 +21,8 @@ export type Profile = {
   created_at: string;
 };
 
+export type ServiceType = "day" | "home" | "both";
+
 export type Dog = {
   id: string;
   owner_id: string | null;
@@ -41,6 +43,7 @@ export type Dog = {
   vet_phone: string | null;
   vet_address: string | null;
   active: boolean;
+  service_type: ServiceType;
   pending_owner_email: string | null;
   pending_owner_name: string | null;
   pending_owner_phone: string | null;
@@ -141,5 +144,14 @@ export type BookingRequest = {
   note: string | null;
   status: "pending" | "approved" | "declined";
   admin_note: string | null;
+  created_at: string;
+};
+
+export type RosterRow = {
+  id: string;
+  dog_id: string;
+  month: string;
+  added_manually: boolean;
+  hidden: boolean;
   created_at: string;
 };
