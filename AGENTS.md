@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+Dog saves validate the current identity through the writing client's getUser; customer inserts use that identity and customer edits omit ownership to avoid stale-session reassignment.

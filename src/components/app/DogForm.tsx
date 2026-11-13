@@ -16,6 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { dogOwnership } from "@/lib/dog-owner";
 import { uploadDogFile, useProfiles } from "@/lib/queries";
 import type { Dog } from "@/lib/types";
 
@@ -67,7 +68,6 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const ownerId = isAdmin ? get("owner_id") || null : (session?.user.id ?? null);
     const row = {
       name: get("name").trim(),
       date_of_birth: get("date_of_birth") || null,
@@ -84,13 +84,17 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
       vet_clinic: get("vet_clinic") || null,
       vet_phone: get("vet_phone") || null,
       vet_address: get("vet_address") || null,
-      owner_id: ownerId,
       service_type: (get("service_type") || "both") as Dog["service_type"],
     };
     try {
+      // Revalidate the identity used by the same client that sends the write.
+      // A cached context session can lag behind token refresh or account changes.
+      const { data: identity, error: authError } = await supabase.auth.getUser();
+      if (authError) throw new Error("Your sign-in could not be verified. Please sign in again before saving your dog.");
+      const payload = { ...row, ...dogOwnership(identity.user?.id, isAdmin, get("owner_id"), Boolean(dog)) };
       const res = dog
-        ? await supabase.from("dogs").update(row).eq("id", dog.id).select("*").single()
-        : await supabase.from("dogs").insert(row).select("*").single();
+        ? await supabase.from("dogs").update(payload).eq("id", dog.id).select("*").single()
+        : await supabase.from("dogs").insert(payload).select("*").single();
       if (res.error) throw new Error(res.error.message);
       let saved = res.data as Dog;
       if (photo) {
@@ -255,7 +259,7 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
         </section>
       ) : null}
 
-      <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={busy}>
+      <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={busy || !session}>
         {busy ? "Saving…" : "Save"}
       </Button>
     </form>
