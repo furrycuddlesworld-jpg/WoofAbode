@@ -52,15 +52,25 @@ describe("monthRoster", () => {
   });
   it("includes home dogs when added or booked", () => {
     expect(
-      monthRoster({ dogs: ds, records: [{ dog_id: "old", status: "scheduled" }], roster: [{ dog_id: "home", hidden: false }] }),
+      monthRoster({
+        dogs: ds,
+        records: [{ dog_id: "old", status: "scheduled" }],
+        roster: [{ dog_id: "home", hidden: false }],
+      }),
     ).toEqual(["day", "both", "home", "old"]);
   });
   it("hidden removes a dog even with bookings, but not with attended days", () => {
     expect(
       monthRoster({
         dogs: ds,
-        records: [{ dog_id: "day", status: "scheduled" }, { dog_id: "both", status: "present" }],
-        roster: [{ dog_id: "day", hidden: true }, { dog_id: "both", hidden: true }],
+        records: [
+          { dog_id: "day", status: "scheduled" },
+          { dog_id: "both", status: "present" },
+        ],
+        roster: [
+          { dog_id: "day", hidden: true },
+          { dog_id: "both", hidden: true },
+        ],
       }),
     ).toEqual(["both"]);
   });
