@@ -187,6 +187,41 @@ export type Database = {
           },
         ]
       }
+      day_boarding_roster: {
+        Row: {
+          added_manually: boolean
+          created_at: string
+          dog_id: string
+          hidden: boolean
+          id: string
+          month: string
+        }
+        Insert: {
+          added_manually?: boolean
+          created_at?: string
+          dog_id: string
+          hidden?: boolean
+          id?: string
+          month: string
+        }
+        Update: {
+          added_manually?: boolean
+          created_at?: string
+          dog_id?: string
+          hidden?: boolean
+          id?: string
+          month?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_boarding_roster_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dogs: {
         Row: {
           active: boolean
@@ -206,6 +241,7 @@ export type Database = {
           pending_owner_name: string | null
           pending_owner_phone: string | null
           photo_path: string | null
+          service_type: string
           sex: string | null
           vet_address: string | null
           vet_clinic: string | null
@@ -231,6 +267,7 @@ export type Database = {
           pending_owner_name?: string | null
           pending_owner_phone?: string | null
           photo_path?: string | null
+          service_type?: string
           sex?: string | null
           vet_address?: string | null
           vet_clinic?: string | null
@@ -256,6 +293,7 @@ export type Database = {
           pending_owner_name?: string | null
           pending_owner_phone?: string | null
           photo_path?: string | null
+          service_type?: string
           sex?: string | null
           vet_address?: string | null
           vet_clinic?: string | null
