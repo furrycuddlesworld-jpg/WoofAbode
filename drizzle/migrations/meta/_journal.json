@@ -29,6 +29,13 @@
       "when": 1794574900731,
       "tag": "0003_day_boarding_roster",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794576147077,
+      "tag": "0004_restrict_settings_read",
+      "breakpoints": true
     }
   ]
 }
