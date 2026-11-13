@@ -43,3 +43,29 @@ export function checkInGroups(input: {
   }
   return { expected, others };
 }
+
+/**
+ * Dogs shown on the month attendance grid: active day/both dogs, dogs with any record that month,
+ * and dogs added for the month — minus dogs removed for the month (unless they have attended days).
+ */
+export function monthRoster(input: {
+  dogs: { id: string; name: string; active: boolean; service_type: "day" | "home" | "both" }[];
+  records: { dog_id: string; status: string }[]; // records within the month
+  roster: { dog_id: string; hidden: boolean }[]; // roster rows for the month
+}): string[] {
+  const { dogs, records, roster } = input;
+  const hidden = new Set(roster.filter((r) => r.hidden).map((r) => r.dog_id));
+  const added = new Set(roster.filter((r) => !r.hidden).map((r) => r.dog_id));
+  const withRecords = new Set(records.map((r) => r.dog_id));
+  const attended = new Set(records.filter((r) => r.status === "present").map((r) => r.dog_id));
+  return [...dogs]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .filter((d) => {
+      if (attended.has(d.id)) return true;
+      if (hidden.has(d.id)) return false;
+      return (
+        (d.active && d.service_type !== "home") || withRecords.has(d.id) || added.has(d.id)
+      );
+    })
+    .map((d) => d.id);
+}

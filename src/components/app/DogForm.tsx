@@ -38,6 +38,7 @@ const TEXT_FIELDS = [
   "vet_phone",
   "vet_address",
   "owner_id",
+  "service_type",
 ] as const;
 
 function toForm(dog: Partial<Dog> | null): FormState {
@@ -54,7 +55,7 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
   const queryClient = useQueryClient();
   const { data: profiles = [] } = useProfiles(isAdmin);
   const [form, setForm] = useState<FormState>(() =>
-    toForm(dog ?? { owner_id: session?.user.id ?? null }),
+    toForm(dog ?? { owner_id: session?.user.id ?? null, service_type: "both" }),
   );
   const [photo, setPhoto] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -84,6 +85,7 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
       vet_phone: get("vet_phone") || null,
       vet_address: get("vet_address") || null,
       owner_id: ownerId,
+      service_type: (get("service_type") || "both") as Dog["service_type"],
     };
     try {
       const res = dog
@@ -168,6 +170,21 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
               <SelectContent>
                 <SelectItem value="true">Yes</SelectItem>
                 <SelectItem value="false">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Usually comes for">
+            <Select
+              value={get("service_type") || "both"}
+              onValueChange={(v) => setForm((f) => ({ ...f, service_type: v }))}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Day boarding</SelectItem>
+                <SelectItem value="home">Home boarding</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
               </SelectContent>
             </Select>
           </Field>
