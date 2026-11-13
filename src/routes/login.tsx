@@ -1,5 +1,5 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { PawPrint } from "lucide-react";
+import logo from "@/assets/woofabode-logo.png";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -58,10 +58,8 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex size-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <PawPrint className="size-8" />
-          </div>
-          <h1 className="text-3xl font-bold">WoofAbode</h1>
+          <img src={logo} alt="WoofAbode" className="mx-auto mb-2 h-36 w-auto object-contain" />
+          <h1 className="sr-only">WoofAbode</h1>
           <p className="mt-1 text-muted-foreground">A home away from home for your dog</p>
         </div>
         {!isSupabaseConfigured ? (
