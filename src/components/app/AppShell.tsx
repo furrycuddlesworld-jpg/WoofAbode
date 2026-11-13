@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, LogOut, PawPrint } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
+import logo from "@/assets/woofabode-logo.png";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -54,9 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
           <Link to={isAdmin ? "/admin" : "/home"} className="flex items-center gap-2 font-bold">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <PawPrint className="size-5" />
-            </span>
+            <img src={logo} alt="WoofAbode logo" className="size-10 object-contain" />
             <span className="text-lg">WoofAbode</span>
             {isAdmin ? (
               <span className="rounded-md bg-accent px-1.5 py-0.5 text-xs font-semibold">
