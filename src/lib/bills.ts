@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { billStatus, calculateBill, stayDates } from "./billing";
 import { addDays, eachDate, firstDayOfMonth, formatMonth, lastDayOfMonth, monthOf } from "./dates";
 import type { Advance, Bill, DayBoarding, Dog, Rate, StayRow } from "./types";
+import { pricingRows, type DogRate } from "./dog-rates";
 
 export type GenerateResult =
   { ok: true; bill: Bill; warnings: string[] } | { ok: false; reason: string };
@@ -37,7 +38,10 @@ export async function generateBill(parentId: string, month: string): Promise<Gen
   }
 
   const [ratesRes, daysRes, staysRes, advRes, otherBillsRes] = await Promise.all([
-    supabase.from("rates").select("*").in("dog_id", dogIds),
+    Promise.all([
+      supabase.from("dog_rates").select("*").in("dog_id", dogIds),
+      supabase.from("rates").select("*").in("dog_id", dogIds),
+    ]).then(([history, legacy]) => ({ data: pricingRows((history.data ?? []) as DogRate[], (legacy.data ?? []) as Rate[]), error: history.error ?? legacy.error })),
     supabase
       .from("day_boarding")
       .select("*")
@@ -85,6 +89,7 @@ export async function generateBill(parentId: string, month: string): Promise<Gen
     advanceAvailable,
   });
 
+  if (calc.missingRateDogs.length) return { ok: false, reason: calc.missingRateDogs.map(name => `Set rate for ${name} first`).join(". ") };
   if (!existing && calc.lines.length === 0) {
     return { ok: false, reason: `No charges for ${formatMonth(month)}, so no bill was made.` };
   }
@@ -187,7 +192,7 @@ export async function closeMonth(
     if (res.ok) {
       made += 1;
       warnings.push(...res.warnings);
-    }
+    } else warnings.push(res.reason);
   }
   return { made, warnings };
 }

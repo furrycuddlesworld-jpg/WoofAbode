@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
+import { pricingRows, type DogRate } from "./dog-rates";
 import type {
   Bill,
   DayBoarding,
@@ -69,13 +70,10 @@ export function useRates(dogIds: string[] | undefined) {
     enabled: Boolean(dogIds),
     queryFn: () =>
       dogIds && dogIds.length
-        ? rows<Rate>(
-            supabase
-              .from("rates")
-              .select("*")
-              .in("dog_id", dogIds)
-              .order("effective_from", { ascending: false }),
-          )
+        ? Promise.all([
+            rows<DogRate>(supabase.from("dog_rates").select("*").in("dog_id", dogIds)),
+            rows<Rate>(supabase.from("rates").select("*").in("dog_id", dogIds)),
+          ]).then(([history, legacy]) => pricingRows(history, legacy))
         : Promise.resolve([]),
   });
 }

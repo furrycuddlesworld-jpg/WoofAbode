@@ -23,6 +23,7 @@ export function useAttendance() {
     for (const pid of parents) {
       const res = await generateBill(pid, monthOf(date));
       if (res.ok) res.warnings.forEach((w) => toast.warning(w));
+      else toast.error(res.reason);
     }
     if (parents.length) {
       toast.success(`${formatMonth(monthOf(date))} bill${parents.length === 1 ? "" : "s"} updated`);

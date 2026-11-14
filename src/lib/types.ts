@@ -44,6 +44,8 @@ export type Dog = {
   vet_address: string | null;
   active: boolean;
   service_type: ServiceType;
+  day_boarding_rate: number | null;
+  home_boarding_rate: number | null;
   pending_owner_email: string | null;
   pending_owner_name: string | null;
   pending_owner_phone: string | null;

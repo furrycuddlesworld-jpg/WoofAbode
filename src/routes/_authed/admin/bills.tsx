@@ -84,6 +84,7 @@ function AdminBills() {
       const res = await generateBill(pid, month);
       if (res.ok) made += 1;
       if (res.ok) res.warnings.forEach((w) => toast.warning(w));
+      else toast.error(res.reason);
     }
     setBusy(false);
     toast.success(`${made} bill${made === 1 ? "" : "s"} with charges for ${formatMonth(month)}`);
