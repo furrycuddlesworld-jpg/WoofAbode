@@ -22,3 +22,7 @@ it("keeps a bill partly paid until its final payment date", () => {
   expect(result.bills[0]?.settledOn).toBeNull();
   expect(result.billDue).toBe(600);
 });
+import { cashInHand } from "./finance";
+it("cash in hand subtracts only paid spends from money received", () => {
+  expect(cashInHand(10000, 3000)).toBe(7000);
+});

@@ -7,3 +7,30 @@ it("earns dated per-dog charges, excludes future nights, and subtracts confirmed
   expect(result.paid).toBe(500);
   expect(result.due).toBe(2200);
 });
+const base = { from: "2026-11-01", to: "2026-11-30", today: "2026-11-30", service: "all" as const, dogs: [{ id: "d", name: "Dog" }], stays: [], payments: [] };
+const rates = [{ dog_id: "d", effective_from: "2026-11-01", day_rate: 600, night_rate: 1000, same_day_rate: null }];
+const days = [{ dog_id: "d", date: "2026-11-02", status: "present" }, { dog_id: "d", date: "2026-11-03", status: "present" }, { dog_id: "d", date: "2026-11-10", status: "present" }];
+
+it("counts attended days with no saved bill as to be billed", () => {
+  const r = revenueSummary({ ...base, rates, days, bills: [] });
+  expect(r.toBeBilled).toBe(1800);
+  expect(r.billedEarned).toBe(0);
+});
+
+it("excludes days already on a saved bill from to be billed", () => {
+  const bills = [{ id: "b", month: "2026-11", lines: [{ dog_id: "d", dog_name: "Dog", kind: "day" as const, description: "", quantity: 2, rate: 600, amount: 1200, estimate: false, dates: ["2026-11-02", "2026-11-03"] }] }];
+  const r = revenueSummary({ ...base, rates, days, bills });
+  expect(r.toBeBilled).toBe(600);
+  expect(r.billedEarned).toBe(1200);
+});
+
+it("prices unbilled days at the rate in effect on each date", () => {
+  const r = revenueSummary({ ...base, rates: [...rates, { dog_id: "d", effective_from: "2026-11-05", day_rate: 700, night_rate: 1000, same_day_rate: null }], days, bills: [] });
+  expect(r.toBeBilled).toBe(1900);
+});
+
+it("leaves dogs without a rate out of to be billed and flags them", () => {
+  const r = revenueSummary({ ...base, rates: [], days, bills: [] });
+  expect(r.toBeBilled).toBe(0);
+  expect(r.missing).toEqual(["Dog"]);
+});
