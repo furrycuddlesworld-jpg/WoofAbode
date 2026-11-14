@@ -27,6 +27,24 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   const [day, setDay] = useState("");
   const [night, setNight] = useState("");
   const [same, setSame] = useState("");
+  const [editing, setEditing] = useState<string | null>(null);
+
+  function startEdit(r: { effective_from: string; day_rate: number | null; night_rate: number | null; same_day_rate: number | null }) {
+    const v = (n: number | null) => (n == null ? "" : String(n));
+    setEditing(r.effective_from);
+    setFrom(r.effective_from);
+    setDay(v(r.day_rate));
+    setNight(v(r.night_rate));
+    setSame(v(r.same_day_rate));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function cancelEdit() {
+    setEditing(null);
+    setFrom(todayIST());
+    setDay("");
+    setNight("");
+    setSame("");
+  }
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -43,7 +61,8 @@ export function RatesPanel({ dog }: { dog: Dog }) {
       const { error } = await supabase.from("rates").upsert({ dog_id: dog.id, effective_from: from, same_day_rate: num(same) }, { onConflict: "dog_id,effective_from" });
       if (error) return void toast.error(error.message);
     }
-    toast.success("Rates saved");
+    toast.success(editing ? "Rates updated" : "Rates saved");
+    setEditing(null);
     setDay("");
     setNight("");
     setSame("");
@@ -58,7 +77,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   return (
     <div className="space-y-5">
       <form onSubmit={save} className="space-y-4 rounded-2xl border bg-card p-4">
-        <h3 className="font-semibold">Set new rates</h3>
+        <h3 className="font-semibold">{editing ? `Edit rates from ${formatDate(editing)}` : "Set new rates"}</h3>
         <p className="text-sm text-muted-foreground">
           Leave a box empty to keep the earlier rate for that service. Old bills keep the rates that
           applied then.
@@ -95,7 +114,11 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             />
           </Field>
         </div>
-        <Button type="submit">Save rates</Button>
+        <div className="flex gap-2">
+          <Button type="submit">{editing ? "Save changes" : "Save rates"}</Button>
+          {editing ? <Button type="button" variant="outline" onClick={cancelEdit}>Cancel</Button> : null}
+        </div>
+        {editing ? <p className="text-xs text-muted-foreground">Bills already created keep their amounts. New bills use the updated rates.</p> : null}
       </form>
 
       {rates.length === 0 ? (
@@ -121,6 +144,9 @@ export function RatesPanel({ dog }: { dog: Dog }) {
                   <TableCell>{show(r.day_rate)}</TableCell>
                   <TableCell>{show(r.night_rate)}</TableCell>
                   <TableCell>{show(r.same_day_rate)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(r)}>Edit</Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
