@@ -14,6 +14,7 @@ export function useAttendance() {
     queryClient.invalidateQueries({ queryKey: ["admin-day"] });
     queryClient.invalidateQueries({ queryKey: ["attendance"] });
     queryClient.invalidateQueries({ queryKey: ["day-boarding"] });
+    queryClient.invalidateQueries({ queryKey: ["revenue"] });
   }
 
   // Bills follow attendance on the last day of a month, and for fixes to a month that is over.

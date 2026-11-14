@@ -96,7 +96,7 @@ export function stayNights(stay: Stay): number {
 export function estimateStayAmount(stay: Stay, rates: RateRow[]): number | null {
   const { start, end } = stayDates(stay);
   if (start === end) {
-    return rateOn(rates, stay.dog_id, start, "same_day_rate");
+    return stay.night_rate_override ?? rateOn(rates, stay.dog_id, start, "same_day_rate");
   }
   let total = 0;
   for (const night of eachDate(start, addDays(end, -1))) {
