@@ -11,4 +11,4 @@
 
 # Boarding category revenue
 - [x] Show day boarding, full boarding, and combined revenue together using existing pricing.
-- [ ] Test category totals and verify the signed-in dashboard.
+- [x] Test category totals and verify the signed-in dashboard.
