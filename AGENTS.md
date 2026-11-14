@@ -18,3 +18,4 @@ Keep business expenses admin-only; paid_on is the source of paid status so expen
 Report saved bill totals separately from earned revenue; bill-period balances use confirmed payment history through the selected end date.
 Use revenueByService for the dashboard's simultaneous service and total columns so they reuse dated billing calculations and proportional payment allocation.
 Keep sitemap inclusion explicit in each route and derive URLs from the router; exclude authenticated subtrees, redirects and password recovery to avoid advertising private pages.
+Use the shared MonthlyCharges display and revenueByService for client month-to-date charges; this keeps attendance, dated rates, and elapsed-night pricing aligned with the dashboard without treating charges as a saved bill.

@@ -2,6 +2,8 @@ import { CalendarDays } from "lucide-react";
 
 import { EmptyState, Pill, Stat } from "@/components/app/Common";
 import { Calendar } from "@/components/ui/calendar";
+import { MonthlyCharges } from "@/components/app/MonthlyCharges";
+import { useAuth } from "@/lib/auth";
 import { stayDates, stayNights } from "@/lib/billing";
 import { formatDate } from "@/lib/dates";
 import { useDayBoarding, useStays } from "@/lib/queries";
@@ -24,6 +26,7 @@ export function StayStatusPill({ status }: { status: StayRow["status"] }) {
 }
 
 export function BoardingPanel({ dog }: { dog: Dog }) {
+  const { isApproved, isAdmin } = useAuth();
   const { data: days = [] } = useDayBoarding([dog.id]);
   const { data: stays = [] } = useStays([dog.id]);
   const counts = boardingCounts(dog.id, days, stays);
@@ -34,6 +37,7 @@ export function BoardingPanel({ dog }: { dog: Dog }) {
 
   return (
     <div className="space-y-5">
+      {isApproved && !isAdmin ? <MonthlyCharges dog={dog} /> : null}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Day boarding this month" value={counts.daysThisMonth} hint="days" />
         <Stat label="Day boarding all time" value={counts.daysAllTime} hint="days" />

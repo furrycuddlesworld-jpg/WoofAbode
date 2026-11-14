@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { StayStatusPill } from "@/components/app/BoardingPanel";
 import { EmptyState, Field, Loading, Pill } from "@/components/app/Common";
 import { DogAvatar } from "@/components/app/DogAvatar";
+import { MonthlyCharges } from "@/components/app/MonthlyCharges";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -178,6 +179,7 @@ function HomePage() {
                       </div>
                     </div>
                   ) : null}
+                  {isApproved ? <MonthlyCharges dog={d} compact /> : null}
                 </Link>
               );
             })}

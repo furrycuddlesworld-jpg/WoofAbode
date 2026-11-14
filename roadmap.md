@@ -17,3 +17,7 @@
 - [x] Clarify the sign-in heading and matching page metadata.
 - [x] Add a router-derived sitemap containing public pages only and reference it in robots.txt.
 - [x] Verify both corrections and record resolved findings.
+
+# Client monthly charges
+- [x] Show running day, full boarding and total charges on client home and boarding views.
+- [ ] Test charges and verify a signed-in client's view.

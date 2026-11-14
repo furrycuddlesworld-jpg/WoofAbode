@@ -11,6 +11,13 @@ const base = { from: "2026-11-01", to: "2026-11-30", today: "2026-11-30", servic
 const rates = [{ dog_id: "d", effective_from: "2026-11-01", day_rate: 600, night_rate: 1000, same_day_rate: null }];
 const days = [{ dog_id: "d", date: "2026-11-02", status: "present" }, { dog_id: "d", date: "2026-11-03", status: "present" }, { dog_id: "d", date: "2026-11-10", status: "present" }] as { dog_id: string; date: string; status: "present" }[];
 
+it("shows Miso's seven attended days at 750 as 5250 in running monthly charges", () => {
+  const r = revenueByService({ ...base, today: "2026-11-14", dogs: [{ id: "miso", name: "Miso" }], rates: [{ dog_id: "miso", effective_from: "2026-11-01", day_rate: 750, night_rate: null, same_day_rate: null }], days: ["02", "03", "04", "05", "06", "09", "10"].map(day => ({ dog_id: "miso", date: `2026-11-${day}`, status: "present" as const })), bills: [] });
+  expect(r.day.generated).toBe(5250);
+  expect(r.home.generated).toBe(0);
+  expect(r.total.generated).toBe(5250);
+});
+
 it("counts attended days with no saved bill as to be billed", () => {
   const r = revenueSummary({ ...base, rates, days, bills: [] });
   expect(r.toBeBilled).toBe(1800);
