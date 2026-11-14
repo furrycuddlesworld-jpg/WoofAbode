@@ -11,6 +11,7 @@ import { useDogs } from "@/lib/queries";
 import type { BookingRequest } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/requests")({
+  staticData: { sitemap: false },
   head: () => pageHead("Booking requests", "Review boarding requests from WoofAbode pet parents."),
   component: RequestsPage,
 });

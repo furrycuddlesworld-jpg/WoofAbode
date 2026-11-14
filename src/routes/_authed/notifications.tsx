@@ -11,6 +11,7 @@ import type { Notification } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/notifications")({
+  staticData: { sitemap: false },
   head: () => pageHead("Notifications", "Your WoofAbode boarding and payment updates."),
   component: NotificationsPage,
 });

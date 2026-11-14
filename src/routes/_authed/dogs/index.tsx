@@ -9,6 +9,7 @@ import { formatAge } from "@/lib/dates";
 import { useDogs } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/dogs/")({
+  staticData: { sitemap: false },
   head: () => pageHead("My dogs", "Manage your dogs and care records at WoofAbode."),
   component: DogsPage,
 });

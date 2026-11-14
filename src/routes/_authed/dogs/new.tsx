@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/app/Common";
 import { DogForm } from "@/components/app/DogForm";
 
 export const Route = createFileRoute("/_authed/dogs/new")({
+  staticData: { sitemap: false },
   head: () => pageHead("Add a dog", "Add a dog and care details to your WoofAbode account."),
   component: NewDog,
 });

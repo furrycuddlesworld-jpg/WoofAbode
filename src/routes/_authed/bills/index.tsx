@@ -9,6 +9,7 @@ import { formatINR, formatMonth } from "@/lib/dates";
 import { useBills } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/bills/")({
+  staticData: { sitemap: false },
   head: () => pageHead("My bills", "Your monthly WoofAbode bills and receipts."),
   component: BillsPage,
 });

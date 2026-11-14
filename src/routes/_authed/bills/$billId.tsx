@@ -6,6 +6,7 @@ import { BillView } from "@/components/app/BillView";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authed/bills/$billId")({
+  staticData: { sitemap: false },
   head: () => pageHead("Bill details", "Review your WoofAbode charges, dated rates and payments."),
   component: BillPage,
 });
