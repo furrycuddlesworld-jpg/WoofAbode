@@ -20,4 +20,4 @@
 
 # Client monthly charges
 - [x] Show running day, full boarding and total charges on client home and boarding views.
-- [ ] Test charges and verify a signed-in client's view.
+- [x] Test charges and verify a signed-in client's view.
