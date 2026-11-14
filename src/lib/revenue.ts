@@ -1,5 +1,5 @@
 import { calculateBill, stayDates, type RateRow, type DayRecord, type Stay, type BillLine } from "./billing";
-import { eachDate, monthOf, addDays } from "./dates";
+import { eachDate, monthOf } from "./dates";
 
 export function revenueSummary(input: {
   from: string; to: string; today: string; service: "all" | "day" | "home";
@@ -10,7 +10,7 @@ export function revenueSummary(input: {
 }) {
   const to = input.to < input.today ? input.to : input.today;
   const months = [...new Set(eachDate(input.from, to).map(monthOf))];
-  const stays = input.stays.filter(s => !s.imported && s.status !== "scheduled" && stayDates(s).start <= to).map(s => {
+  const stays = input.stays.filter(s => !s.imported && s.status !== "scheduled" && (stayDates(s).start < input.today || (s.status === "completed" && stayDates(s).start <= to))).map(s => {
     const dates = stayDates(s);
     // Only nights that have elapsed count as earned revenue.
     const end = dates.end < input.today ? dates.end : input.today;

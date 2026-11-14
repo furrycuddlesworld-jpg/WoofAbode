@@ -8,6 +8,7 @@ import { EmptyState, Loading, PageHeader, Stat } from "@/components/app/Common";
 import { CheckInBoard } from "@/components/app/CheckInBoard";
 import { DogAvatar } from "@/components/app/DogAvatar";
 import { StayActions } from "@/components/app/StayActions";
+import { RevenueSummary } from "@/components/app/RevenueSummary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,6 +138,7 @@ function TodayPage() {
       ) : null}
 
       {isLoading ? <Loading /> : null}
+      <RevenueSummary />
 
       <section className="mb-8">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">

@@ -24,7 +24,6 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   const { data: rates = [] } = useRates([dog.id]);
   const queryClient = useQueryClient();
   const [from, setFrom] = useState(todayIST());
-  const current = rates.find((r) => r.effective_from <= todayIST());
   const [day, setDay] = useState("");
   const [night, setNight] = useState("");
   const [same, setSame] = useState("");
@@ -90,7 +89,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             <Input
               type="number"
               min="0"
-              placeholder={current?.same_day_rate?.toString() ?? "e.g. 750"}
+              placeholder={rateOn(rates, dog.id, todayIST(), "same_day_rate")?.toString() ?? "Not set"}
               value={same}
               onChange={(e) => setSame(e.target.value)}
             />
