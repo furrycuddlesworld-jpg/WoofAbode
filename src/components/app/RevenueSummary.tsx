@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useDogs, useRates } from "@/lib/queries";
-import { revenueSummary } from "@/lib/revenue";
+import { revenueSummary, revenueByService } from "@/lib/revenue";
 import { financeSummary, cashInHand } from "@/lib/finance";
 import { firstDayOfMonth, lastDayOfMonth, previousMonth, monthOf, todayIST, formatINR, formatDate, formatMonth } from "@/lib/dates";
 import { useProfiles } from "@/lib/queries";
@@ -47,6 +47,14 @@ export function RevenueSummary() {
     }
   }
   const result = revenueSummary({ from, to, today, service, dogs, rates, days: data?.days ?? [], stays: data?.stays ?? [], bills: data?.bills ?? [], payments: data?.payments ?? [] });
+  const categories = revenueByService({ from, to, today, dogs, rates, days: data?.days ?? [], stays: data?.stays ?? [], bills: data?.bills ?? [], payments: data?.payments ?? [] });
+  const incomeMetrics = [
+    { label: "Realised (earned)", key: "generated", needsRates: true },
+    { label: "Billed", key: "billedEarned", needsRates: true },
+    { label: "To be billed", key: "toBeBilled", needsRates: true },
+    { label: "Received", key: "paid", needsRates: false },
+    { label: "To be paid", key: "due", needsRates: true },
+  ] as const;
   const invalid = from > to;
   const through = to < today ? to : today;
   const finance = financeSummary({ from, to, today, service, bills: data?.bills ?? [], payments: data?.payments ?? [], expenses: data?.expenses ?? [] });
@@ -58,20 +66,19 @@ export function RevenueSummary() {
       <Field label="Period"><Select value={preset} onValueChange={choose}><SelectTrigger className="w-36"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="month">This month</SelectItem><SelectItem value="last">Last month</SelectItem><SelectItem value="year">This year</SelectItem><SelectItem value="all">All time</SelectItem><SelectItem value="custom">Custom</SelectItem></SelectContent></Select></Field>
       <Field label="From"><Input aria-label="Revenue from" type="date" className="w-auto" value={from} onChange={e => { if (e.target.value) { setFrom(e.target.value); setPreset("custom"); } }} /></Field>
       <Field label="To"><Input aria-label="Revenue to" type="date" className="w-auto" value={to} onChange={e => { if (e.target.value) { setTo(e.target.value); setPreset("custom"); } }} /></Field>
-      <Field label="Service"><Select value={service} onValueChange={v => setService(v as typeof service)}><SelectTrigger className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="day">Day boarding</SelectItem><SelectItem value="home">Home boarding</SelectItem></SelectContent></Select></Field>
+      <Field label="Details & spends"><Select value={service} onValueChange={v => setService(v as typeof service)}><SelectTrigger className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All boarding</SelectItem><SelectItem value="day">Day boarding</SelectItem><SelectItem value="home">Full boarding</SelectItem></SelectContent></Select></Field>
       <Field label="Payment status"><Select value={paymentStatus} onValueChange={setPaymentStatus}><SelectTrigger className="w-40" aria-label="Dashboard payment status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All</SelectItem><SelectItem value="paid">Paid</SelectItem><SelectItem value="pending">Unpaid</SelectItem><SelectItem value="partly_paid">Partly paid</SelectItem></SelectContent></Select></Field>
     </div>
     {invalid ? <p className="text-destructive">End date must be after start date.</p> : null}
     {error ? <p className="text-destructive">{error.message}</p> : null}
     {isLoading || ratesLoading ? <Loading /> : !error && !invalid ? <>
-      {result.missing.length ? <div className="rounded-md bg-warning/25 p-3 text-sm text-warning-foreground">{result.missing.map(name => <p key={name}>Set rate for {name} first</p>)}</div> : null}
+      {categories.total.missing.length ? <div className="rounded-md bg-warning/25 p-3 text-sm text-warning-foreground">{categories.total.missing.map(name => <p key={name}>Set rate for {name} first</p>)}</div> : null}
       <h3 className="text-sm font-semibold text-muted-foreground">Income</h3>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <Stat label="Realised (earned)" value={result.missing.length ? "—" : formatINR(result.generated)} hint="Work done at dog rates" />
-        <Stat label="Billed" value={result.missing.length ? "—" : formatINR(result.billedEarned)} hint="Earned work on saved bills" />
-        <Stat label="To be billed" value={result.missing.length ? "—" : formatINR(result.toBeBilled)} hint="Earned, no bill yet" />
-        <Stat label="Received" value={formatINR(result.paid)} hint="Confirmed payments" />
-        <Stat label="To be paid" value={result.missing.length ? "—" : formatINR(result.due)} hint="Earned − Received" />
+      <div className="overflow-x-auto">
+        <table aria-label="Revenue by boarding category" className="w-full text-sm">
+          <thead><tr className="border-b text-left text-muted-foreground"><th className="p-2">Revenue</th><th className="p-2 text-right">Day boarding</th><th className="p-2 text-right">Full boarding</th><th className="bg-muted/40 p-2 text-right font-semibold text-foreground">Total</th></tr></thead>
+          <tbody>{incomeMetrics.map(metric => <tr key={metric.key} className="border-b"><th scope="row" className="p-2 text-left font-medium">{metric.label}</th>{([categories.day, categories.home, categories.total]).map((category, i) => <td key={i} className={`whitespace-nowrap p-2 text-right tabular-nums ${i === 2 ? "bg-muted/40 font-semibold" : ""}`}>{metric.needsRates && category.missing.length ? "—" : formatINR(category[metric.key])}</td>)}</tr>)}</tbody>
+        </table>
       </div>
       <p className="text-xs text-muted-foreground">Saved bills in this period total {formatINR(finance.billed)} (after advances).</p>
       <h3 className="text-sm font-semibold text-muted-foreground">Spends</h3>
@@ -96,7 +103,7 @@ export function RevenueSummary() {
         </TabsContent>
         <TabsContent value="unbilled">
           <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left text-muted-foreground"><th className="p-2">Dog</th><th className="p-2">Service</th><th className="p-2">Dates</th><th className="p-2 text-right">Qty × rate</th><th className="p-2 text-right">Amount</th></tr></thead><tbody>
-            {result.rows.flatMap(r => r.unbilled.map((u, i) => <tr key={r.id + i} className="border-b align-top"><td className="p-2 font-semibold">{r.name}</td><td className="p-2">{u.kind === "day" ? "Day boarding" : "Home boarding"}</td><td className="p-2 text-xs text-muted-foreground">{u.dates.length ? u.dates.map(d => formatDate(d)).join(", ") : u.description}</td><td className="p-2 text-right tabular-nums">{u.quantity} × {formatINR(u.rate)}{u.special ? " (special rate)" : ""}</td><td className="p-2 text-right tabular-nums">{formatINR(u.amount)}</td></tr>))}
+            {result.rows.flatMap(r => r.unbilled.map((u, i) => <tr key={r.id + i} className="border-b align-top"><td className="p-2 font-semibold">{r.name}</td><td className="p-2">{u.kind === "day" ? "Day boarding" : "Full boarding"}</td><td className="p-2 text-xs text-muted-foreground">{u.dates.length ? u.dates.map(d => formatDate(d)).join(", ") : u.description}</td><td className="p-2 text-right tabular-nums">{u.quantity} × {formatINR(u.rate)}{u.special ? " (special rate)" : ""}</td><td className="p-2 text-right tabular-nums">{formatINR(u.amount)}</td></tr>))}
             {result.missing.map(n => <tr key={n} className="border-b"><td colSpan={5} className="p-2 text-warning-foreground">Set rate for {n} first</td></tr>)}
             {!result.rows.some(r => r.unbilled.length) && !result.missing.length ? <tr><td colSpan={5} className="py-6 text-muted-foreground">Everything earned in this period is already billed.</td></tr> : null}
           </tbody></table></div>

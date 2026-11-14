@@ -8,3 +8,7 @@
 - [x] Add admin-only business expenses with paid/unpaid status and payment date.
 - [x] Show total billed and bill payment details alongside revenue and spending totals.
 - [x] Test totals and verify expense recording and payment dates in the signed-in dashboard.
+
+# Boarding category revenue
+- [x] Show day boarding, full boarding, and combined revenue together using existing pricing.
+- [ ] Test category totals and verify the signed-in dashboard.

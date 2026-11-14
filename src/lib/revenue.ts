@@ -1,6 +1,15 @@
 import { calculateBill, stayDates, type RateRow, type DayRecord, type Stay, type BillLine } from "./billing";
 import { eachDate, monthOf } from "./dates";
 
+/** Service columns share the same dated pricing and payment allocation as the detail views. */
+export function revenueByService(input: Omit<Parameters<typeof revenueSummary>[0], "service">) {
+  return {
+    day: revenueSummary({ ...input, service: "day" }),
+    home: revenueSummary({ ...input, service: "home" }),
+    total: revenueSummary({ ...input, service: "all" }),
+  };
+}
+
 export function revenueSummary(input: {
   from: string; to: string; today: string; service: "all" | "day" | "home";
   dogs: { id: string; name: string }[]; rates: RateRow[]; days: (DayRecord & { imported?: boolean })[];
