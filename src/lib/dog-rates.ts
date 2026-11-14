@@ -15,3 +15,21 @@ export function pricingRows(history: DogRate[], legacy: (RateRow & { id: string 
   }
   return [...rows, ...legacy.map(r => ({ ...r, day_rate: null, night_rate: null }))];
 }
+export type GroupedRate = {
+  effective_from: string;
+  day: DogRate | null; home: DogRate | null; dayIds: string[]; homeIds: string[];
+  legacy: (RateRow & { id: string }) | null;
+};
+
+/** One display row per start date: newest day + home rate and the legacy same-day rate side by side. */
+export function groupRateRows(history: DogRate[], legacy: (RateRow & { id: string })[]): GroupedRate[] {
+  const map = new Map<string, GroupedRate>();
+  const get = (d: string) => map.get(d) ?? (map.set(d, { effective_from: d, day: null, home: null, dayIds: [], homeIds: [], legacy: null }), map.get(d)!);
+  const sorted = [...history].sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id));
+  for (const r of sorted) {
+    const g = get(r.effective_from);
+    if (r.service === "day") { g.dayIds.push(r.id); g.day ??= r; } else { g.homeIds.push(r.id); g.home ??= r; }
+  }
+  for (const r of legacy) { const g = get(r.effective_from); if (r.same_day_rate != null || !g.legacy) g.legacy = r; }
+  return [...map.values()].filter(g => g.day || g.home || g.legacy?.same_day_rate != null || g.legacy).sort((a, b) => b.effective_from.localeCompare(a.effective_from));
+}

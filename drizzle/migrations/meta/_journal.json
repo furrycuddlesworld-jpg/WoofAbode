@@ -50,6 +50,13 @@
       "when": 1794635642010,
       "tag": "0006_business_expenses",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794636999781,
+      "tag": "0007_dog_rates_admin_corrections",
+      "breakpoints": true
     }
   ]
 }
