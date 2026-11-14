@@ -9,7 +9,7 @@ it("earns dated per-dog charges, excludes future nights, and subtracts confirmed
 });
 const base = { from: "2026-11-01", to: "2026-11-30", today: "2026-11-30", service: "all" as const, dogs: [{ id: "d", name: "Dog" }], stays: [], payments: [] };
 const rates = [{ dog_id: "d", effective_from: "2026-11-01", day_rate: 600, night_rate: 1000, same_day_rate: null }];
-const days = [{ dog_id: "d", date: "2026-11-02", status: "present" }, { dog_id: "d", date: "2026-11-03", status: "present" }, { dog_id: "d", date: "2026-11-10", status: "present" }];
+const days = [{ dog_id: "d", date: "2026-11-02", status: "present" }, { dog_id: "d", date: "2026-11-03", status: "present" }, { dog_id: "d", date: "2026-11-10", status: "present" }] as { dog_id: string; date: string; status: "present" }[];
 
 it("counts attended days with no saved bill as to be billed", () => {
   const r = revenueSummary({ ...base, rates, days, bills: [] });
