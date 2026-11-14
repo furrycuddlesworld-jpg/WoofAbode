@@ -16,3 +16,14 @@ The "Received" and "To be paid" cards stay as they are. Together the cards read:
 - `RevenueSummary.tsx`: add the stat cards and the "To be billed" tab, and reuse the existing period and service filters.
 - Tests in `finance.test.ts`: (1) attended days not on a bill count as to be billed; (2) days on a saved bill don't count; (3) a rate change splits the amount correctly; (4) a dog with a missing rate shows up in missingRateDogs and is left out of the total.
 - No database changes.
+
+## Clearer spend and profit cards
+Today, "Total Spends" shows what the business spent, and "Revenue − Spends" shows earned revenue minus those spends, which is your profit on paper. The labels make these two easy to mix up, so they will become:
+
+- **Total Spends**: unchanged.
+- **Profit (earned)**: earned revenue minus total spends. This replaces "Revenue − Spends".
+- **Cash in hand**: money received minus spends already paid. This is the actual cash position.
+
+Each card gets a one-line hint under its number, for example "Earned − Spends". The cards will be grouped into three rows: Income (Realised, Billed, To be billed, Received, To be paid), Spends (Total, Paid, Unpaid), and Result (Profit, Cash in hand). On a phone, each row stacks neatly.
+
+Technical: `finance.ts` adds `cashInHand = received - expensePaid`. A new test checks that cash in hand ignores unpaid spends.
