@@ -11,7 +11,7 @@
 
 Dog saves validate the current identity through the writing client's getUser; customer inserts use that identity and customer edits omit ownership to avoid stale-session reassignment.
 
-Use append-only dog_rates as the authoritative day/night pricing history; legacy rates retain same-day pricing and mirror imports so historical dates remain billable.
+Use dog_rates as the authoritative day/night pricing history: new rates append rows, admins may correct an entry in place (one display row per start date); legacy rates retain same-day pricing and mirror imports so historical dates remain billable.
 Use calculateBill for earned revenue and billing, with explicit date bounds and missing-rate blocking; shared calculations prevent pricing drift.
 Allocate confirmed bill payments proportionally to saved dog/service line amounts in revenue reports because existing payments belong to parent bills, not individual dogs.
 Keep business expenses admin-only; paid_on is the source of paid status so expense amounts and payment dates cannot disagree.
