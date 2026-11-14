@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 
 // Every page inside this layout needs a signed-in user. Pages under /admin also need the admin role.
 export const Route = createFileRoute("/_authed")({
+  staticData: { sitemap: "exclude-subtree" },
   component: AuthedLayout,
 });
 

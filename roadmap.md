@@ -12,3 +12,8 @@
 # Boarding category revenue
 - [x] Show day boarding, full boarding, and combined revenue together using existing pricing.
 - [x] Test category totals and verify the signed-in dashboard.
+
+# SEO findings
+- [x] Clarify the sign-in heading and matching page metadata.
+- [ ] Add a router-derived sitemap containing public pages only and reference it in robots.txt.
+- [ ] Verify both corrections and record resolved findings.

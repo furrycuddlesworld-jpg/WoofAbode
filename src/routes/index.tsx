@@ -5,6 +5,7 @@ import { Loading } from "@/components/app/Common";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: false },
   head: () => pageHead("Boarding care", "Manage your WoofAbode dogs, boarding visits and payments."),
   component: Index,
 });
