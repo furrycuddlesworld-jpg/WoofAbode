@@ -76,7 +76,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
       }
       const same = edit.same === "" ? null : Number(edit.same);
       if (g.legacy) {
-        // Legacy row update re-fires the mirror trigger, so tidy any day/night copies it adds.
+        // Day/night live in dog_rates; clearing them here stops the mirror trigger re-adding copies.
         const { error } = await supabase.from("rates").update({ effective_from: edit.from, same_day_rate: same, day_rate: null, night_rate: null }).eq("id", g.legacy.id); if (error) throw error;
       } else if (same != null) {
         const { error } = await supabase.from("rates").insert({ dog_id: dog.id, effective_from: edit.from, same_day_rate: same }); if (error) throw error;

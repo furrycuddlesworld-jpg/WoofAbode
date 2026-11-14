@@ -20,8 +20,8 @@ it("shows one row per date with the newest day, night and same-day rates", () =>
   ];
   const rows = groupRateRows(h, [{ id: "L", dog_id: "d", effective_from: "2026-11-10", day_rate: 750, night_rate: 1500, same_day_rate: 750 }]);
   expect(rows).toHaveLength(1);
-  expect(rows[0].day?.rate).toBe(750);
-  expect(rows[0].dayIds).toEqual(["2", "1"]);
-  expect(rows[0].home?.rate).toBe(1500);
-  expect(rows[0].legacy?.same_day_rate).toBe(750);
+  expect(rows[0]!.day?.rate).toBe(750);
+  expect(rows[0]!.dayIds).toEqual(["2", "1"]);
+  expect(rows[0]!.home?.rate).toBe(1500);
+  expect(rows[0]!.legacy?.same_day_rate).toBe(750);
 });
