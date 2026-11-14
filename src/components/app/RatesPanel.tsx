@@ -92,6 +92,22 @@ export function RatesPanel({ dog }: { dog: Dog }) {
     }
   }
 
+  async function removeEntry(g: GroupedRate) {
+    if (!window.confirm(`Delete the rates starting ${formatDate(g.effective_from)}? Bills already created keep their amounts.`)) return;
+    setBusy(true);
+    try {
+      const ids = [...g.dayIds, ...g.homeIds];
+      if (ids.length) { const { error } = await supabase.from("dog_rates").delete().in("id", ids); if (error) throw error; }
+      if (g.legacy) { const { error } = await supabase.from("rates").delete().eq("id", g.legacy.id); if (error) throw error; }
+      toast.success("Rates deleted");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete rates");
+    } finally {
+      setBusy(false);
+      refresh();
+    }
+  }
+
   async function save(e: FormEvent) {
     e.preventDefault();
     const num = (v: string) => (v === "" ? null : Number(v));
@@ -196,8 +212,9 @@ export function RatesPanel({ dog }: { dog: Dog }) {
                   <TableCell>{show(g.day?.rate ?? null)}</TableCell>
                   <TableCell>{show(g.home?.rate ?? null)}</TableCell>
                   <TableCell>{show(g.legacy?.same_day_rate ?? null)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="ghost" onClick={() => startEdit(g)}>Edit</Button>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <Button size="sm" variant="ghost" onClick={() => startEdit(g)}>Edit</Button>{" "}
+                    <Button size="sm" variant="ghost" className="text-destructive" disabled={busy} onClick={() => removeEntry(g)}>Delete</Button>
                   </TableCell>
                 </TableRow>
               ))}
