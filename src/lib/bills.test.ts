@@ -3,9 +3,9 @@ const mock = vi.hoisted(() => ({ writes: 0, data: {} as Record<string, unknown> 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { from: (table: string) => {
   const query: Record<string, unknown> = {};
   for (const method of ["select", "eq", "neq", "in", "gte", "lte", "maybeSingle", "single"]) query[method] = () => query;
-  query.upsert = () => { mock.writes++; return query; };
-  query.insert = () => { mock.writes++; return query; };
-  query.then = (resolve: (value: unknown) => unknown) => Promise.resolve({ data: mock.data[table] ?? [], error: null }).then(resolve);
+  query["upsert"] = () => { mock.writes++; return query; };
+  query["insert"] = () => { mock.writes++; return query; };
+  query["then"] = (resolve: (value: unknown) => unknown) => Promise.resolve({ data: mock.data[table] ?? [], error: null }).then(resolve);
   return query;
 } } }));
 import { generateBill } from "./bills";
