@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
@@ -18,6 +18,8 @@ import { formatDate, formatINR, todayIST } from "@/lib/dates";
 import { useRates } from "@/lib/queries";
 import { rateOn } from "@/lib/billing";
 import type { Dog } from "@/lib/types";
+import { groupRateRows, type DogRate, type GroupedRate } from "@/lib/dog-rates";
+import type { RateRow } from "@/lib/billing";
 
 /** Admin only: each dog's day, night and same-day rates, with the date each starts. */
 export function RatesPanel({ dog }: { dog: Dog }) {
@@ -27,23 +29,67 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   const [day, setDay] = useState("");
   const [night, setNight] = useState("");
   const [same, setSame] = useState("");
-  const [editing, setEditing] = useState<string | null>(null);
+  const { data: raw } = useQuery({
+    queryKey: ["rates", "raw", dog.id],
+    queryFn: async () => {
+      const [h, l] = await Promise.all([
+        supabase.from("dog_rates").select("*").eq("dog_id", dog.id),
+        supabase.from("rates").select("*").eq("dog_id", dog.id),
+      ]);
+      if (h.error || l.error) throw new Error((h.error ?? l.error)!.message);
+      return { history: (h.data ?? []) as DogRate[], legacy: (l.data ?? []) as (RateRow & { id: string })[] };
+    },
+  });
+  const grouped = raw ? groupRateRows(raw.history, raw.legacy) : [];
+  const [edit, setEdit] = useState<{ key: string; from: string; day: string; night: string; same: string } | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  function startEdit(r: { effective_from: string; day_rate: number | null; night_rate: number | null; same_day_rate: number | null }) {
-    const v = (n: number | null) => (n == null ? "" : String(n));
-    setEditing(r.effective_from);
-    setFrom(r.effective_from);
-    setDay(v(r.day_rate));
-    setNight(v(r.night_rate));
-    setSame(v(r.same_day_rate));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function startEdit(g: GroupedRate) {
+    const v = (n: number | null | undefined) => (n == null ? "" : String(n));
+    setEdit({ key: g.effective_from, from: g.effective_from, day: v(g.day?.rate), night: v(g.home?.rate), same: v(g.legacy?.same_day_rate) });
   }
-  function cancelEdit() {
-    setEditing(null);
-    setFrom(todayIST());
-    setDay("");
-    setNight("");
-    setSame("");
+
+  function refresh() {
+    queryClient.invalidateQueries({ queryKey: ["rates"] });
+    queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    queryClient.invalidateQueries({ queryKey: ["dog", dog.id] });
+    queryClient.invalidateQueries({ queryKey: ["revenue"] });
+  }
+
+  async function saveEdit(g: GroupedRate) {
+    if (!edit || !edit.from) return;
+    if (edit.from !== g.effective_from && grouped.some((x) => x.effective_from === edit.from)) {
+      return void toast.error("An entry already exists for this date");
+    }
+    setBusy(true);
+    try {
+      for (const [service, value, ids] of [["day", edit.day, g.dayIds], ["home", edit.night, g.homeIds]] as const) {
+        const [keep, ...older] = ids;
+        if (older.length) { const { error } = await supabase.from("dog_rates").delete().in("id", older); if (error) throw error; }
+        if (value === "") {
+          if (keep) { const { error } = await supabase.from("dog_rates").delete().eq("id", keep); if (error) throw error; }
+        } else if (keep) {
+          const { error } = await supabase.from("dog_rates").update({ rate: Number(value), effective_from: edit.from }).eq("id", keep); if (error) throw error;
+        } else {
+          const { error } = await supabase.from("dog_rates").insert({ dog_id: dog.id, service, rate: Number(value), effective_from: edit.from }); if (error) throw error;
+        }
+      }
+      const same = edit.same === "" ? null : Number(edit.same);
+      if (g.legacy) {
+        // Legacy row update re-fires the mirror trigger, so tidy any day/night copies it adds.
+        const { error } = await supabase.from("rates").update({ effective_from: edit.from, same_day_rate: same, day_rate: null, night_rate: null }).eq("id", g.legacy.id); if (error) throw error;
+      } else if (same != null) {
+        const { error } = await supabase.from("rates").insert({ dog_id: dog.id, effective_from: edit.from, same_day_rate: same }); if (error) throw error;
+      }
+      toast.success("Rates updated");
+      setEdit(null);
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not update rates");
+      refresh();
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function save(e: FormEvent) {
@@ -61,8 +107,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
       const { error } = await supabase.from("rates").upsert({ dog_id: dog.id, effective_from: from, same_day_rate: num(same) }, { onConflict: "dog_id,effective_from" });
       if (error) return void toast.error(error.message);
     }
-    toast.success(editing ? "Rates updated" : "Rates saved");
-    setEditing(null);
+    toast.success("Rates saved");
     setDay("");
     setNight("");
     setSame("");
@@ -77,7 +122,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   return (
     <div className="space-y-5">
       <form onSubmit={save} className="space-y-4 rounded-2xl border bg-card p-4">
-        <h3 className="font-semibold">{editing ? `Edit rates from ${formatDate(editing)}` : "Set new rates"}</h3>
+        <h3 className="font-semibold">Set new rates</h3>
         <p className="text-sm text-muted-foreground">
           Leave a box empty to keep the earlier rate for that service. Old bills keep the rates that
           applied then.
@@ -114,14 +159,10 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             />
           </Field>
         </div>
-        <div className="flex gap-2">
-          <Button type="submit">{editing ? "Save changes" : "Save rates"}</Button>
-          {editing ? <Button type="button" variant="outline" onClick={cancelEdit}>Cancel</Button> : null}
-        </div>
-        {editing ? <p className="text-xs text-muted-foreground">Bills already created keep their amounts. New bills use the updated rates.</p> : null}
+        <Button type="submit">Save rates</Button>
       </form>
 
-      {rates.length === 0 ? (
+      {grouped.length === 0 ? (
         <EmptyState title="No rates yet">
           Bills can't be calculated for {dog.name} until rates are set.
         </EmptyState>
@@ -138,14 +179,25 @@ export function RatesPanel({ dog }: { dog: Dog }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rates.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell>{formatDate(r.effective_from)}</TableCell>
-                  <TableCell>{show(r.day_rate)}</TableCell>
-                  <TableCell>{show(r.night_rate)}</TableCell>
-                  <TableCell>{show(r.same_day_rate)}</TableCell>
+              {grouped.map((g) => edit?.key === g.effective_from ? (
+                <TableRow key={g.effective_from}>
+                  <TableCell><Input aria-label="Edit start date" type="date" className="w-40" value={edit.from} onChange={(e) => setEdit({ ...edit, from: e.target.value })} /></TableCell>
+                  <TableCell><Input aria-label="Edit day rate" type="number" min="0" className="w-24" value={edit.day} onChange={(e) => setEdit({ ...edit, day: e.target.value })} /></TableCell>
+                  <TableCell><Input aria-label="Edit night rate" type="number" min="0" className="w-24" value={edit.night} onChange={(e) => setEdit({ ...edit, night: e.target.value })} /></TableCell>
+                  <TableCell><Input aria-label="Edit same-day rate" type="number" min="0" className="w-24" value={edit.same} onChange={(e) => setEdit({ ...edit, same: e.target.value })} /></TableCell>
+                  <TableCell className="whitespace-nowrap text-right">
+                    <Button size="sm" disabled={busy} onClick={() => saveEdit(g)}>Save</Button>{" "}
+                    <Button size="sm" variant="ghost" onClick={() => setEdit(null)}>Cancel</Button>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <TableRow key={g.effective_from}>
+                  <TableCell>{formatDate(g.effective_from)}</TableCell>
+                  <TableCell>{show(g.day?.rate ?? null)}</TableCell>
+                  <TableCell>{show(g.home?.rate ?? null)}</TableCell>
+                  <TableCell>{show(g.legacy?.same_day_rate ?? null)}</TableCell>
                   <TableCell className="text-right">
-                    <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(r)}>Edit</Button>
+                    <Button size="sm" variant="ghost" onClick={() => startEdit(g)}>Edit</Button>
                   </TableCell>
                 </TableRow>
               ))}
