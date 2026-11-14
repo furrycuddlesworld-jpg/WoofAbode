@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
@@ -10,6 +11,7 @@ import type { Notification } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/notifications")({
+  head: () => pageHead("Notifications", "Your WoofAbode boarding and payment updates."),
   component: NotificationsPage,
 });
 

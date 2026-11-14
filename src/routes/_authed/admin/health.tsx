@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { EmptyState, Loading, PageHeader, Pill } from "@/components/app/Common";
@@ -6,6 +7,7 @@ import { DUE_TONE, dueLabel, dueState, KIND_LABEL, latestRecords } from "@/lib/h
 import { useDogs, useHealth } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/health")({
+  head: () => pageHead("Health administration", "Review WoofAbode vaccinations and health records."),
   component: HealthDashboard,
 });
 

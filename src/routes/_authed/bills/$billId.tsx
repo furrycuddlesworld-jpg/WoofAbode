@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
@@ -5,6 +6,7 @@ import { BillView } from "@/components/app/BillView";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authed/bills/$billId")({
+  head: () => pageHead("Bill details", "Review your WoofAbode charges, dated rates and payments."),
   component: BillPage,
 });
 

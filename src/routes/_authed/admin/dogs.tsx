@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import { DUE_TONE, dueState, latestRecords } from "@/lib/health";
 import { useDogs, useHealth, useProfiles, useRates } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/dogs")({
+  head: () => pageHead("Dog administration", "Manage WoofAbode dogs, health alerts and individual rates."),
   component: AdminDogs,
 });
 

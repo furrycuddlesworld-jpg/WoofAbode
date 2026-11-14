@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Home, Pencil, Sun, Trash2 } from "lucide-react";
@@ -28,6 +29,7 @@ import { useDogs, useRates, useSettings } from "@/lib/queries";
 import type { DayBoarding, Dog, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/schedule")({
+  head: () => pageHead("Boarding schedule", "Manage WoofAbode day and home boarding bookings."),
   component: SchedulePage,
 });
 

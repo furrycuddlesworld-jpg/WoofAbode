@@ -1,9 +1,11 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 
 import { Loading } from "@/components/app/Common";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
+  head: () => pageHead("Boarding care", "Manage your WoofAbode dogs, boarding visits and payments."),
   component: Index,
 });
 

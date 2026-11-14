@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Home, Sun } from "lucide-react";
@@ -18,6 +19,7 @@ import { useDogs, useSettings } from "@/lib/queries";
 import type { DayBoarding, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/")({
+  head: () => pageHead("Today and revenue", "Daily boarding attendance and earned revenue at WoofAbode."),
   component: TodayPage,
 });
 

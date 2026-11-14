@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileSpreadsheet, Wand2 } from "lucide-react";
@@ -23,6 +24,7 @@ import { useBills, useDogs, useProfiles } from "@/lib/queries";
 import type { Advance, Payment, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/bills")({
+  head: () => pageHead("Billing administration", "Generate monthly WoofAbode bills using dated per-dog rates."),
   component: AdminBills,
 });
 

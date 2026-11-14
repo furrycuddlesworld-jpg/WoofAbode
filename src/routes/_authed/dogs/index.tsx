@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Dog as DogIcon, Plus } from "lucide-react";
 
@@ -8,6 +9,7 @@ import { formatAge } from "@/lib/dates";
 import { useDogs } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/dogs/")({
+  head: () => pageHead("My dogs", "Manage your dogs and care records at WoofAbode."),
   component: DogsPage,
 });
 

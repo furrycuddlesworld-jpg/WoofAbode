@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ import { useDogs } from "@/lib/queries";
 import type { BookingRequest } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/requests")({
+  head: () => pageHead("Booking requests", "Review boarding requests from WoofAbode pet parents."),
   component: RequestsPage,
 });
 

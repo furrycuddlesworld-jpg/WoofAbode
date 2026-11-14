@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ChevronLeft, ChevronRight, MoreHorizontal, Plus, Receipt } from "lucide-react";
@@ -50,6 +51,7 @@ import { useAttendance } from "@/lib/useAttendance";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/admin/attendance")({
+  head: () => pageHead("Attendance", "Monthly WoofAbode attendance and individual special rates."),
   component: AttendancePage,
 });
 
