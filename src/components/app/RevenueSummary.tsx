@@ -10,7 +10,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useDogs, useRates } from "@/lib/queries";
 import { revenueSummary } from "@/lib/revenue";
-import { financeSummary } from "@/lib/finance";
+import { financeSummary, cashInHand } from "@/lib/finance";
 import { firstDayOfMonth, lastDayOfMonth, previousMonth, monthOf, todayIST, formatINR, formatDate, formatMonth } from "@/lib/dates";
 import { useProfiles } from "@/lib/queries";
 import type { DayBoarding, StayRow, Bill, Payment, Expense } from "@/lib/types";
@@ -65,23 +65,40 @@ export function RevenueSummary() {
     {error ? <p className="text-destructive">{error.message}</p> : null}
     {isLoading || ratesLoading ? <Loading /> : !error && !invalid ? <>
       {result.missing.length ? <div className="rounded-md bg-warning/25 p-3 text-sm text-warning-foreground">{result.missing.map(name => <p key={name}>Set rate for {name} first</p>)}</div> : null}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label="Total Generated" value={result.missing.length ? "—" : formatINR(result.generated)} />
-        <Stat label="Total Bill" value={formatINR(finance.billed)} />
-        <Stat label="Received" value={formatINR(result.paid)} />
-        <Stat label="To Be Paid" value={result.missing.length ? "—" : formatINR(result.due)} />
-        <Stat label="Total Spends" value={formatINR(finance.expenseTotal)} />
-        <Stat label="Spends Paid" value={formatINR(finance.expensePaid)} />
-        <Stat label="Spends Unpaid" value={formatINR(finance.expenseUnpaid)} />
-        <Stat label="Revenue − Spends" value={result.missing.length ? "—" : formatINR(result.generated - finance.expenseTotal)} />
+      <h3 className="text-sm font-semibold text-muted-foreground">Income</h3>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <Stat label="Realised (earned)" value={result.missing.length ? "—" : formatINR(result.generated)} hint="Work done at dog rates" />
+        <Stat label="Billed" value={result.missing.length ? "—" : formatINR(result.billedEarned)} hint="Earned work on saved bills" />
+        <Stat label="To be billed" value={result.missing.length ? "—" : formatINR(result.toBeBilled)} hint="Earned, no bill yet" />
+        <Stat label="Received" value={formatINR(result.paid)} hint="Confirmed payments" />
+        <Stat label="To be paid" value={result.missing.length ? "—" : formatINR(result.due)} hint="Earned − Received" />
+      </div>
+      <p className="text-xs text-muted-foreground">Saved bills in this period total {formatINR(finance.billed)} (after advances).</p>
+      <h3 className="text-sm font-semibold text-muted-foreground">Spends</h3>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Stat label="Total spends" value={formatINR(finance.expenseTotal)} hint="Everything spent" />
+        <Stat label="Spends paid" value={formatINR(finance.expensePaid)} />
+        <Stat label="Spends unpaid" value={formatINR(finance.expenseUnpaid)} />
+      </div>
+      <h3 className="text-sm font-semibold text-muted-foreground">Result</h3>
+      <div className="grid grid-cols-2 gap-3">
+        <Stat label="Profit (earned)" value={result.missing.length ? "—" : formatINR(result.generated - finance.expenseTotal)} hint="Earned − Total spends" />
+        <Stat label="Cash in hand" value={formatINR(cashInHand(result.paid, finance.expensePaid))} hint="Received − Spends paid" />
       </div>
       <Tabs defaultValue="bills" className="space-y-4">
-        <TabsList><TabsTrigger value="bills">Bills</TabsTrigger><TabsTrigger value="spends">Spends</TabsTrigger><TabsTrigger value="dogs">By dog</TabsTrigger></TabsList>
+        <TabsList><TabsTrigger value="bills">Bills</TabsTrigger><TabsTrigger value="unbilled">To be billed</TabsTrigger><TabsTrigger value="spends">Spends</TabsTrigger><TabsTrigger value="dogs">By dog</TabsTrigger></TabsList>
         <TabsContent value="bills" className="space-y-3">
           <div className="flex flex-wrap justify-between gap-2 text-sm"><span>Bills paid: <b>{formatINR(finance.billPaid)}</b> · Bills unpaid: <b>{formatINR(finance.billDue)}</b></span><Button asChild variant="outline" size="sm"><Link to="/admin/bills">View all bills</Link></Button></div>
           <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left text-muted-foreground"><th className="p-2">Bill / Parent</th><th className="p-2 text-right">Total bill</th><th className="p-2 text-right">Paid</th><th className="p-2 text-right">Unpaid</th><th className="p-2">Status</th><th className="p-2">Payment dates</th></tr></thead><tbody>
             {shownBills.map(b => { const parent = profiles.find(p => p.id === b.bill.parent_id); return <tr key={b.bill.id} className="border-b align-top"><td className="p-2"><Link className="font-semibold text-primary" to="/bills/$billId" params={{ billId: b.bill.id }}>Bill #{b.bill.bill_number}</Link><div>{parent?.full_name || parent?.email || "Pet parent"}</div><div className="text-xs text-muted-foreground">{formatMonth(b.bill.month)}{b.bill.has_estimate ? " · estimate" : ""}</div></td><td className="p-2 text-right tabular-nums">{formatINR(b.total)}</td><td className="p-2 text-right tabular-nums">{formatINR(b.paid)}</td><td className="p-2 text-right tabular-nums">{formatINR(b.due)}</td><td className="p-2"><Pill tone={b.status === "paid" ? "green" : "amber"}>{b.status === "paid" ? "Paid" : b.status === "partly_paid" ? "Partly paid" : "Unpaid"}</Pill></td><td className="min-w-44 p-2">{b.settledOn ? <div className="font-medium text-success">Paid on {formatDate(b.settledOn)}</div> : null}{b.payments.map(p => <div key={p.id} className="text-xs text-muted-foreground">{formatDate(p.paid_on)} · {formatINR(p.amount)} · {p.method.toUpperCase()}</div>)}{!b.payments.length ? "—" : null}</td></tr>; })}
             {!shownBills.length ? <tr><td colSpan={6} className="py-6 text-muted-foreground">No bills match this period and status.</td></tr> : null}
+          </tbody></table></div>
+        </TabsContent>
+        <TabsContent value="unbilled">
+          <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b text-left text-muted-foreground"><th className="p-2">Dog</th><th className="p-2">Service</th><th className="p-2">Dates</th><th className="p-2 text-right">Qty × rate</th><th className="p-2 text-right">Amount</th></tr></thead><tbody>
+            {result.rows.flatMap(r => r.unbilled.map((u, i) => <tr key={r.id + i} className="border-b align-top"><td className="p-2 font-semibold">{r.name}</td><td className="p-2">{u.kind === "day" ? "Day boarding" : "Home boarding"}</td><td className="p-2 text-xs text-muted-foreground">{u.dates.length ? u.dates.map(d => formatDate(d)).join(", ") : u.description}</td><td className="p-2 text-right tabular-nums">{u.quantity} × {formatINR(u.rate)}{u.special ? " (special rate)" : ""}</td><td className="p-2 text-right tabular-nums">{formatINR(u.amount)}</td></tr>))}
+            {result.missing.map(n => <tr key={n} className="border-b"><td colSpan={5} className="p-2 text-warning-foreground">Set rate for {n} first</td></tr>)}
+            {!result.rows.some(r => r.unbilled.length) && !result.missing.length ? <tr><td colSpan={5} className="py-6 text-muted-foreground">Everything earned in this period is already billed.</td></tr> : null}
           </tbody></table></div>
         </TabsContent>
         <TabsContent value="spends"><ExpensesPanel expenses={shownExpenses} through={through} /></TabsContent>

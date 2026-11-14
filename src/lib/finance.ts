@@ -21,3 +21,8 @@ export function financeSummary(input: { from: string; to: string; today: string;
   const expensePaid = expenses.filter(e => e.paid_on && e.paid_on <= end).reduce((s, e) => s + Number(e.amount), 0);
   return { bills, expenses, billed: bills.reduce((s, b) => s + b.total, 0), billPaid: bills.reduce((s, b) => s + b.paid, 0), billDue: bills.reduce((s, b) => s + b.due, 0), expenseTotal, expensePaid, expenseUnpaid: expenseTotal - expensePaid };
 }
+
+/** Actual cash position: money received minus spends already paid (unpaid spends ignored). */
+export function cashInHand(received: number, expensePaid: number) {
+  return received - expensePaid;
+}
