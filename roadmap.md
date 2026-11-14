@@ -23,5 +23,5 @@
 - [x] Test charges and verify a signed-in client's view.
 
 # Automatic client approval
-- [ ] Automatically assign client access on registration and approve existing waiting clients.
-- [ ] Verify automatic access and admin-only attendance and pricing.
+- [x] Automatically assign client access on registration and approve existing waiting clients.
+- [x] Verify automatic access and admin-only attendance and pricing.

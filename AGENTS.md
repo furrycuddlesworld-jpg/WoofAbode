@@ -19,3 +19,4 @@ Report saved bill totals separately from earned revenue; bill-period balances us
 Use revenueByService for the dashboard's simultaneous service and total columns so they reuse dated billing calculations and proportional payment allocation.
 Keep sitemap inclusion explicit in each route and derive URLs from the router; exclude authenticated subtrees, redirects and password recovery to avoid advertising private pages.
 Use the shared MonthlyCharges display and revenueByService for client month-to-date charges; this keeps attendance, dated rates, and elapsed-night pricing aligned with the dashboard without treating charges as a saved bill.
+Assign the client role in the protected registration trigger, never from browser input or metadata; administrators alone grant admin access, so automatic client access cannot escalate privileges.
