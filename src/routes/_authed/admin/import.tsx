@@ -23,6 +23,7 @@ import {
 import type { Dog, Profile } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/import")({
+  staticData: { sitemap: false },
   head: () => pageHead("Import history", "Import existing WoofAbode dog and boarding records."),
   component: ImportPage,
 });

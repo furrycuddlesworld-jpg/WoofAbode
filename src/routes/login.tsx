@@ -13,7 +13,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
-  head: () => pageHead("Sign in", "Sign in to your WoofAbode boarding account."),
+  staticData: { sitemap: true },
+  head: () => ({
+    ...pageHead("Dog boarding — Sign in", "Day boarding and home boarding for your dog at WoofAbode. Sign in to your boarding account."),
+    links: [{ rel: "canonical", href: "https://woofabode.com/login" }],
+    meta: [...pageHead("Dog boarding — Sign in", "Day boarding and home boarding for your dog at WoofAbode. Sign in to your boarding account.").meta,
+      { property: "og:url", content: "https://woofabode.com/login" }],
+  }),
   component: LoginPage,
 });
 
@@ -61,7 +67,7 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <img src={logo} alt="WoofAbode" className="mx-auto mb-2 h-36 w-auto object-contain" />
-          <h1 className="sr-only">WoofAbode</h1>
+          <h1 className="text-xl font-semibold">WoofAbode dog boarding</h1>
           <p className="mt-1 text-muted-foreground">A home away from home for your dog</p>
         </div>
         {!isSupabaseConfigured ? (

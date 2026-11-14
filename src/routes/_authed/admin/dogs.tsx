@@ -14,6 +14,7 @@ import { DUE_TONE, dueState, latestRecords } from "@/lib/health";
 import { useDogs, useHealth, useProfiles, useRates } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/dogs")({
+  staticData: { sitemap: false },
   head: () => pageHead("Dog administration", "Manage WoofAbode dogs, health alerts and individual rates."),
   component: AdminDogs,
 });

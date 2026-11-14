@@ -7,6 +7,7 @@ import { DUE_TONE, dueLabel, dueState, KIND_LABEL, latestRecords } from "@/lib/h
 import { useDogs, useHealth } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/health")({
+  staticData: { sitemap: false },
   head: () => pageHead("Health administration", "Review WoofAbode vaccinations and health records."),
   component: HealthDashboard,
 });

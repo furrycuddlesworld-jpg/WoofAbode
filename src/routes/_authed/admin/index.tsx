@@ -19,6 +19,7 @@ import { useDogs, useSettings } from "@/lib/queries";
 import type { DayBoarding, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/")({
+  staticData: { sitemap: false },
   head: () => pageHead("Revenue and spends", "WoofAbode boarding, total bills, business spends and dated payment status."),
   component: TodayPage,
 });

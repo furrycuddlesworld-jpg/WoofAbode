@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/profile")({
+  staticData: { sitemap: false },
   head: () => pageHead("My profile", "Manage your WoofAbode contact and emergency details."),
   component: ProfilePage,
 });

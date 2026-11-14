@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => pageHead("Reset password", "Set a new password for your WoofAbode account."),
+  staticData: { sitemap: false },
+  head: () => ({ meta: [...pageHead("Reset password", "Set a new password for your WoofAbode account.").meta, { name: "robots", content: "noindex" }] }),
   component: ResetPassword,
 });
 

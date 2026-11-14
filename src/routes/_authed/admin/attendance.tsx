@@ -51,6 +51,7 @@ import { useAttendance } from "@/lib/useAttendance";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/admin/attendance")({
+  staticData: { sitemap: false },
   head: () => pageHead("Attendance", "Monthly WoofAbode attendance and individual special rates."),
   component: AttendancePage,
 });

@@ -17,3 +17,4 @@ Allocate confirmed bill payments proportionally to saved dog/service line amount
 Keep business expenses admin-only; paid_on is the source of paid status so expense amounts and payment dates cannot disagree.
 Report saved bill totals separately from earned revenue; bill-period balances use confirmed payment history through the selected end date.
 Use revenueByService for the dashboard's simultaneous service and total columns so they reuse dated billing calculations and proportional payment allocation.
+Keep sitemap inclusion explicit in each route and derive URLs from the router; exclude authenticated subtrees, redirects and password recovery to avoid advertising private pages.

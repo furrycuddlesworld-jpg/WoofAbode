@@ -29,6 +29,7 @@ import { useDogs, useRates, useSettings } from "@/lib/queries";
 import type { DayBoarding, Dog, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/schedule")({
+  staticData: { sitemap: false },
   head: () => pageHead("Boarding schedule", "Manage WoofAbode day and home boarding bookings."),
   component: SchedulePage,
 });

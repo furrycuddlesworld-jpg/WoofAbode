@@ -43,6 +43,7 @@ import { boardingCounts, upcoming } from "@/lib/stats";
 import type { BookingRequest, Dog } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/home")({
+  staticData: { sitemap: false },
   head: () => pageHead("My boarding", "Your dogs, upcoming boarding and payments at WoofAbode."),
   component: HomePage,
 });

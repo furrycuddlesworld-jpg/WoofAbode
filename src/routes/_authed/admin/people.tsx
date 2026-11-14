@@ -21,6 +21,7 @@ import { useDogs, useProfiles } from "@/lib/queries";
 import type { AppRole } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/people")({
+  staticData: { sitemap: false },
   head: () => pageHead("Pet parents", "Manage WoofAbode pet parent accounts and approvals."),
   component: PeoplePage,
 });

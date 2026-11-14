@@ -12,6 +12,7 @@ import { formatINR, formatMonth } from "@/lib/dates";
 import { useBills, useSettings } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/settings")({
+  staticData: { sitemap: false },
   head: () => pageHead("Business settings", "Manage WoofAbode business details and payment settings."),
   component: SettingsPage,
 });
