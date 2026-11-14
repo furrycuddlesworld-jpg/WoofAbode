@@ -2,13 +2,13 @@ import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 
 // Run with a freshly registered temporary user's session file; never logs credentials.
-it.skipIf(!process.env.CLIENT_ACCESS_SESSION_FILE)("registration grants client access but not attendance or price writes", async () => {
-  const file = process.env.CLIENT_ACCESS_SESSION_FILE;
+it.skipIf(!process.env['CLIENT_ACCESS_SESSION_FILE'])("registration grants client access but not attendance or price writes", async () => {
+  const file = process.env['CLIENT_ACCESS_SESSION_FILE'];
   if (!file) throw new Error("A new client's session is required");
   const { session } = JSON.parse(readFileSync(file, "utf8"));
-  const request = (table: string, method = "GET", body?: unknown) => fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/${table}`, {
-    method, headers: { apikey: process.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "", Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: body ? JSON.stringify(body) : undefined,
+  const request = (table: string, method = "GET", body?: unknown) => fetch(`${process.env['VITE_SUPABASE_URL']}/rest/v1/${table}`, {
+    method, headers: { apikey: process.env['VITE_SUPABASE_PUBLISHABLE_KEY'] ?? "", Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
   const roles = await request(`user_roles?user_id=eq.${session.user.id}&select=role`);
   expect(roles.ok).toBe(true);
