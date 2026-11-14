@@ -15,5 +15,5 @@
 
 # SEO findings
 - [x] Clarify the sign-in heading and matching page metadata.
-- [ ] Add a router-derived sitemap containing public pages only and reference it in robots.txt.
-- [ ] Verify both corrections and record resolved findings.
+- [x] Add a router-derived sitemap containing public pages only and reference it in robots.txt.
+- [x] Verify both corrections and record resolved findings.
