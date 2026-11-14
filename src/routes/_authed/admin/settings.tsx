@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
@@ -11,6 +12,7 @@ import { formatINR, formatMonth } from "@/lib/dates";
 import { useBills, useSettings } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/settings")({
+  head: () => pageHead("Business settings", "Manage WoofAbode business details and payment settings."),
   component: SettingsPage,
 });
 

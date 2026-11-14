@@ -36,6 +36,13 @@
       "when": 1794576147077,
       "tag": "0004_restrict_settings_read",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794635171946,
+      "tag": "0005_per_dog_rate_history",
+      "breakpoints": true
     }
   ]
 }

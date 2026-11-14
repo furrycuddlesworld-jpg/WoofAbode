@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Upload } from "lucide-react";
@@ -22,6 +23,7 @@ import {
 import type { Dog, Profile } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/import")({
+  head: () => pageHead("Import history", "Import existing WoofAbode dog and boarding records."),
   component: ImportPage,
 });
 

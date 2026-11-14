@@ -21,6 +21,8 @@ export type DayRecord = {
   dog_id: string;
   date: string;
   status: "scheduled" | "present" | "absent";
+  rate_override?: number | null;
+  override_reason?: string | null;
 };
 
 export type StayStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
@@ -46,6 +48,8 @@ export type BillLine = {
   amount: number;
   estimate: boolean;
   stay_id?: string;
+  special_rate?: boolean;
+  dates?: string[];
 };
 
 export type BillCalculation = {
@@ -55,6 +59,7 @@ export type BillCalculation = {
   total: number;
   has_estimate: boolean;
   warnings: string[];
+  missingRateDogs: string[];
 };
 
 type RateField = "day_rate" | "night_rate" | "same_day_rate";
@@ -91,7 +96,7 @@ export function stayNights(stay: Stay): number {
 export function estimateStayAmount(stay: Stay, rates: RateRow[]): number | null {
   const { start, end } = stayDates(stay);
   if (start === end) {
-    return rateOn(rates, stay.dog_id, start, "same_day_rate");
+    return stay.night_rate_override ?? rateOn(rates, stay.dog_id, start, "same_day_rate");
   }
   let total = 0;
   for (const night of eachDate(start, addDays(end, -1))) {
@@ -114,12 +119,14 @@ function pushGrouped(
       l.kind === base.kind &&
       l.rate === rate &&
       l.stay_id === base.stay_id &&
+      Boolean(l.special_rate) === Boolean(base.special_rate) &&
       l.estimate === base.estimate,
   );
   if (existing) {
     existing.quantity += 1;
     existing.amount = existing.quantity * rate;
     existing.description = describe(existing.quantity);
+    existing.dates = [...(existing.dates ?? []), ...(base.dates ?? [])];
     return;
   }
   lines.push({ ...base, rate, quantity: 1, amount: rate, description: describe(1) });
@@ -132,26 +139,31 @@ export function calculateBill(input: {
   dayRecords: DayRecord[];
   stays: Stay[];
   advanceAvailable?: number;
+  from?: string;
+  to?: string;
 }): BillCalculation {
   const { month, dogs, rates, dayRecords, stays } = input;
   const dogName = new Map(dogs.map((d) => [d.id, d.name]));
   const lines: BillLine[] = [];
   const warnings: string[] = [];
+  const missingRateDogs = new Set<string>();
+  const inPeriod = (date: string) => monthOf(date) === month && (!input.from || date >= input.from) && (!input.to || date <= input.to);
 
   // Day boarding
   const presentDays = dayRecords
-    .filter((r) => r.status === "present" && monthOf(r.date) === month && dogName.has(r.dog_id))
+    .filter((r) => r.status === "present" && inPeriod(r.date) && dogName.has(r.dog_id))
     .sort((a, b) => a.date.localeCompare(b.date));
   for (const rec of presentDays) {
     const name = dogName.get(rec.dog_id) ?? "";
-    const rate = rateOn(rates, rec.dog_id, rec.date, "day_rate");
+    const rate = rec.rate_override ?? rateOn(rates, rec.dog_id, rec.date, "day_rate");
     if (rate == null) {
       warnings.push(`No day-boarding rate set for ${name} on ${rec.date}.`);
+      missingRateDogs.add(name);
       continue;
     }
     pushGrouped(
       lines,
-      { dog_id: rec.dog_id, dog_name: name, kind: "day", estimate: false },
+      { dog_id: rec.dog_id, dog_name: name, kind: "day", estimate: false, special_rate: rec.rate_override != null, dates: [rec.date] },
       rate,
       (q) => `Day boarding: ${q} day${q === 1 ? "" : "s"}`,
     );
@@ -170,30 +182,32 @@ export function calculateBill(input: {
     }
     const base = { dog_id: stay.dog_id, dog_name: name, estimate, stay_id: stay.id };
     if (start === end) {
-      if (monthOf(start) !== month) continue;
-      const rate = rateOn(rates, stay.dog_id, start, "same_day_rate");
+      if (!inPeriod(start)) continue;
+      const rate = stay.night_rate_override ?? rateOn(rates, stay.dog_id, start, "same_day_rate");
       if (rate == null) {
         warnings.push(`No same-day rate set for ${name} on ${start}.`);
+        missingRateDogs.add(name);
         continue;
       }
       pushGrouped(
         lines,
-        { ...base, kind: "same_day" },
+        { ...base, kind: "same_day", special_rate: stay.night_rate_override != null, dates: [start] },
         rate,
         () => `Same-day stay (${formatDate(start)})`,
       );
       continue;
     }
     for (const night of eachDate(start, addDays(end, -1))) {
-      if (monthOf(night) !== month) continue;
+      if (!inPeriod(night)) continue;
       const rate = stay.night_rate_override ?? rateOn(rates, stay.dog_id, night, "night_rate");
       if (rate == null) {
         warnings.push(`No home-boarding rate set for ${name} on ${night}.`);
+        missingRateDogs.add(name);
         continue;
       }
       pushGrouped(
         lines,
-        { ...base, kind: "night" },
+        { ...base, kind: "night", special_rate: stay.night_rate_override != null, dates: [night] },
         rate,
         (q) =>
           `Home boarding ${formatDate(start)} to ${formatDate(end)}: ${q} night${q === 1 ? "" : "s"}${estimate ? " (estimate)" : ""}`,
@@ -210,6 +224,7 @@ export function calculateBill(input: {
     total: subtotal - advance_applied,
     has_estimate: lines.some((l) => l.estimate),
     warnings: [...new Set(warnings)],
+    missingRateDogs: [...missingRateDogs],
   };
 }
 

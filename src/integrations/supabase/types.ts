@@ -159,6 +159,8 @@ export type Database = {
           id: string
           imported: boolean
           marked_at: string | null
+          override_reason: string | null
+          rate_override: number | null
           status: Database["public"]["Enums"]["day_status"]
         }
         Insert: {
@@ -167,6 +169,8 @@ export type Database = {
           id?: string
           imported?: boolean
           marked_at?: string | null
+          override_reason?: string | null
+          rate_override?: number | null
           status?: Database["public"]["Enums"]["day_status"]
         }
         Update: {
@@ -175,6 +179,8 @@ export type Database = {
           id?: string
           imported?: boolean
           marked_at?: string | null
+          override_reason?: string | null
+          rate_override?: number | null
           status?: Database["public"]["Enums"]["day_status"]
         }
         Relationships: [
@@ -222,6 +228,41 @@ export type Database = {
           },
         ]
       }
+      dog_rates: {
+        Row: {
+          created_at: string
+          dog_id: string
+          effective_from: string
+          id: string
+          rate: number
+          service: string
+        }
+        Insert: {
+          created_at?: string
+          dog_id: string
+          effective_from: string
+          id?: string
+          rate: number
+          service: string
+        }
+        Update: {
+          created_at?: string
+          dog_id?: string
+          effective_from?: string
+          id?: string
+          rate?: number
+          service?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dog_rates_dog_id_fkey"
+            columns: ["dog_id"]
+            isOneToOne: false
+            referencedRelation: "dogs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dogs: {
         Row: {
           active: boolean
@@ -230,7 +271,9 @@ export type Database = {
           breed: string | null
           created_at: string
           date_of_birth: string | null
+          day_boarding_rate: number | null
           food: string | null
+          home_boarding_rate: number | null
           id: string
           location: string | null
           medicines: string | null
@@ -256,7 +299,9 @@ export type Database = {
           breed?: string | null
           created_at?: string
           date_of_birth?: string | null
+          day_boarding_rate?: number | null
           food?: string | null
+          home_boarding_rate?: number | null
           id?: string
           location?: string | null
           medicines?: string | null
@@ -282,7 +327,9 @@ export type Database = {
           breed?: string | null
           created_at?: string
           date_of_birth?: string | null
+          day_boarding_rate?: number | null
           food?: string | null
+          home_boarding_rate?: number | null
           id?: string
           location?: string | null
           medicines?: string | null

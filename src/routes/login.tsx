@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import logo from "@/assets/woofabode-logo.png";
 import { useState, type FormEvent } from "react";
@@ -12,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/login")({
+  head: () => pageHead("Sign in", "Sign in to your WoofAbode boarding account."),
   component: LoginPage,
 });
 

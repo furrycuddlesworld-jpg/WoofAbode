@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, ChevronLeft, ChevronRight, MoreHorizontal, Plus, Receipt } from "lucide-react";
@@ -5,6 +6,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 
 import { EmptyState, Loading, PageHeader } from "@/components/app/Common";
+import { DayRateOverride } from "@/components/app/RateOverride";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,6 +51,7 @@ import { useAttendance } from "@/lib/useAttendance";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/admin/attendance")({
+  head: () => pageHead("Attendance", "Monthly WoofAbode attendance and individual special rates."),
   component: AttendancePage,
 });
 
@@ -327,9 +330,11 @@ function AttendancePage() {
                     {days.map((d) => {
                       const s = status.get(`${dog.id}|${d}`);
                       const key = `${dog.id}|${d}`;
+                      const record = records.find(r => r.dog_id === dog.id && r.date === d);
                       return (
                         <td key={d} className="p-0.5 text-center">
-                          <button
+                          <Button
+                            variant="ghost"
                             type="button"
                             onClick={() => toggle(dog, d)}
                             disabled={busy === key}
@@ -337,7 +342,7 @@ function AttendancePage() {
                             className={cn(
                               "grid size-8 place-items-center rounded-md border transition",
                               s === "present"
-                                ? "border-success bg-success text-white"
+                                ? "border-success bg-success text-success-foreground hover:bg-success/90"
                                 : s === "scheduled"
                                   ? "border-dashed border-primary bg-primary/5"
                                   : "border-border hover:border-primary",
@@ -345,7 +350,8 @@ function AttendancePage() {
                             )}
                           >
                             {s === "present" ? <Check className="size-4" /> : null}
-                          </button>
+                          </Button>
+                          {s === "present" ? <DayRateOverride dogId={dog.id} parentId={dog.owner_id} date={d} value={record?.rate_override ?? null} /> : <div className="h-5" />}
                         </td>
                       );
                     })}

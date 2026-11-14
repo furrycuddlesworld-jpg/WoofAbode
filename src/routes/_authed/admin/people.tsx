@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Phone } from "lucide-react";
@@ -20,6 +21,7 @@ import { useDogs, useProfiles } from "@/lib/queries";
 import type { AppRole } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/people")({
+  head: () => pageHead("Pet parents", "Manage WoofAbode pet parent accounts and approvals."),
   component: PeoplePage,
 });
 

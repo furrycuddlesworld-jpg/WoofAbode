@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -7,10 +8,13 @@ import { DogAvatar } from "@/components/app/DogAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatAge } from "@/lib/dates";
+import { todayIST } from "@/lib/dates";
+import { rateOn } from "@/lib/billing";
 import { DUE_TONE, dueState, latestRecords } from "@/lib/health";
 import { useDogs, useHealth, useProfiles, useRates } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/admin/dogs")({
+  head: () => pageHead("Dog administration", "Manage WoofAbode dogs, health alerts and individual rates."),
   component: AdminDogs,
 });
 
@@ -61,7 +65,7 @@ function AdminDogs() {
               : recs.length
                 ? "ok"
                 : "none";
-          const hasRates = rates.some((r) => r.dog_id === d.id);
+          const hasRates = (d.service_type === "home" || rateOn(rates, d.id, todayIST(), "day_rate") != null) && (d.service_type === "day" || rateOn(rates, d.id, todayIST(), "night_rate") != null);
           return (
             <Link
               key={d.id}
@@ -98,7 +102,7 @@ function AdminDogs() {
                         ? "Vaccines OK"
                         : "No records"}
                 </Pill>
-                {!hasRates ? <Pill tone="red">No rates</Pill> : null}
+                {!hasRates ? <Pill tone="amber">No rates</Pill> : null}
               </div>
             </Link>
           );

@@ -16,6 +16,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate, formatINR, todayIST } from "@/lib/dates";
 import { useRates } from "@/lib/queries";
+import { rateOn } from "@/lib/billing";
 import type { Dog } from "@/lib/types";
 
 /** Admin only: each dog's day, night and same-day rates, with the date each starts. */
@@ -23,7 +24,6 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   const { data: rates = [] } = useRates([dog.id]);
   const queryClient = useQueryClient();
   const [from, setFrom] = useState(todayIST());
-  const current = rates.find((r) => r.effective_from <= todayIST());
   const [day, setDay] = useState("");
   const [night, setNight] = useState("");
   const [same, setSame] = useState("");
@@ -31,29 +31,26 @@ export function RatesPanel({ dog }: { dog: Dog }) {
   async function save(e: FormEvent) {
     e.preventDefault();
     const num = (v: string) => (v === "" ? null : Number(v));
-    const { error } = await supabase.from("rates").upsert(
-      {
-        dog_id: dog.id,
-        effective_from: from,
-        day_rate: num(day),
-        night_rate: num(night),
-        same_day_rate: num(same),
-      },
-      { onConflict: "dog_id,effective_from" },
-    );
-    if (error) return void toast.error(error.message);
+    const changes = [
+      ...(day === "" ? [] : [{ dog_id: dog.id, effective_from: from, service: "day", rate: Number(day) }]),
+      ...(night === "" ? [] : [{ dog_id: dog.id, effective_from: from, service: "home", rate: Number(night) }]),
+    ];
+    if (changes.length) {
+      const { error } = await supabase.from("dog_rates").insert(changes);
+      if (error) return void toast.error(error.message);
+    }
+    if (same !== "") {
+      const { error } = await supabase.from("rates").upsert({ dog_id: dog.id, effective_from: from, same_day_rate: num(same) }, { onConflict: "dog_id,effective_from" });
+      if (error) return void toast.error(error.message);
+    }
     toast.success("Rates saved");
     setDay("");
     setNight("");
     setSame("");
     queryClient.invalidateQueries({ queryKey: ["rates"] });
-  }
-
-  async function remove(id: string) {
-    if (!window.confirm("Delete this rate?")) return;
-    const { error } = await supabase.from("rates").delete().eq("id", id);
-    if (error) return void toast.error(error.message);
-    queryClient.invalidateQueries({ queryKey: ["rates"] });
+    queryClient.invalidateQueries({ queryKey: ["dogs"] });
+    queryClient.invalidateQueries({ queryKey: ["dog", dog.id] });
+    queryClient.invalidateQueries({ queryKey: ["revenue"] });
   }
 
   const show = (v: number | null) => (v == null ? "—" : formatINR(Number(v)));
@@ -74,7 +71,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             <Input
               type="number"
               min="0"
-              placeholder={current?.day_rate?.toString() ?? "e.g. 650"}
+              placeholder={rateOn(rates, dog.id, todayIST(), "day_rate")?.toString() ?? "Not set"}
               value={day}
               onChange={(e) => setDay(e.target.value)}
             />
@@ -83,7 +80,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             <Input
               type="number"
               min="0"
-              placeholder={current?.night_rate?.toString() ?? "e.g. 1200"}
+              placeholder={rateOn(rates, dog.id, todayIST(), "night_rate")?.toString() ?? "Not set"}
               value={night}
               onChange={(e) => setNight(e.target.value)}
             />
@@ -92,7 +89,7 @@ export function RatesPanel({ dog }: { dog: Dog }) {
             <Input
               type="number"
               min="0"
-              placeholder={current?.same_day_rate?.toString() ?? "e.g. 750"}
+              placeholder={rateOn(rates, dog.id, todayIST(), "same_day_rate")?.toString() ?? "Not set"}
               value={same}
               onChange={(e) => setSame(e.target.value)}
             />
@@ -124,11 +121,6 @@ export function RatesPanel({ dog }: { dog: Dog }) {
                   <TableCell>{show(r.day_rate)}</TableCell>
                   <TableCell>{show(r.night_rate)}</TableCell>
                   <TableCell>{show(r.same_day_rate)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="ghost" onClick={() => remove(r.id)}>
-                      Delete
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

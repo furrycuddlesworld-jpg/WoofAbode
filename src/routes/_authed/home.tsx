@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -42,6 +43,7 @@ import { boardingCounts, upcoming } from "@/lib/stats";
 import type { BookingRequest, Dog } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/home")({
+  head: () => pageHead("My boarding", "Your dogs, upcoming boarding and payments at WoofAbode."),
   component: HomePage,
 });
 

@@ -119,6 +119,7 @@ export function BillView({ billId }: { billId: string }) {
                 <span>
                   {l.description}
                   <span className="text-muted-foreground"> × {formatINR(l.rate)}</span>
+                  {l.special_rate ? <span className="ml-2 text-warning-foreground">special rate</span> : null}
                 </span>
                 <span className="tabular-nums">{formatINR(l.amount)}</span>
               </div>

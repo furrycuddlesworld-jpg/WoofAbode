@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Home, Pencil, Sun, Trash2 } from "lucide-react";
@@ -28,6 +29,7 @@ import { useDogs, useRates, useSettings } from "@/lib/queries";
 import type { DayBoarding, Dog, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/schedule")({
+  head: () => pageHead("Boarding schedule", "Manage WoofAbode day and home boarding bookings."),
   component: SchedulePage,
 });
 
@@ -449,6 +451,8 @@ function EditStay({
   const [actualStart, setActualStart] = useState(toLocal(stay.actual_start));
   const [actualEnd, setActualEnd] = useState(toLocal(stay.actual_end));
   const [notes, setNotes] = useState(stay.notes ?? "");
+  const [override, setOverride] = useState(stay.night_rate_override == null ? "" : String(stay.night_rate_override));
+  const [reason, setReason] = useState(stay.override_reason ?? "");
 
   async function save(e: FormEvent) {
     e.preventDefault();
@@ -460,12 +464,15 @@ function EditStay({
         actual_start: actualStart ? new Date(actualStart).toISOString() : null,
         actual_end: actualEnd ? new Date(actualEnd).toISOString() : null,
         notes: notes || null,
+        night_rate_override: override === "" ? null : Number(override),
+        override_reason: reason || null,
       })
       .eq("id", stay.id);
     if (error) return void toast.error(error.message);
     toast.success("Stay updated. Recalculate the bill if one was already made.");
     queryClient.invalidateQueries({ queryKey: ["stays"] });
     onOpenChange(false);
+    queryClient.invalidateQueries({ queryKey: ["revenue"] });
   }
 
   return (
@@ -476,6 +483,12 @@ function EditStay({
         </DialogHeader>
         <form onSubmit={save} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
+            <Field label="Special night rate (optional)">
+              <Input aria-label="Special night rate" type="number" min="0" step="0.01" value={override} onChange={e => setOverride(e.target.value)} />
+            </Field>
+            <Field label="Reason for special rate">
+              <Input value={reason} onChange={e => setReason(e.target.value)} />
+            </Field>
             <Field label="Tentative start">
               <Input
                 type="date"

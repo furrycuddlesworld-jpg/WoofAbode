@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight, Home, Sun } from "lucide-react";
@@ -8,6 +9,7 @@ import { EmptyState, Loading, PageHeader, Stat } from "@/components/app/Common";
 import { CheckInBoard } from "@/components/app/CheckInBoard";
 import { DogAvatar } from "@/components/app/DogAvatar";
 import { StayActions } from "@/components/app/StayActions";
+import { RevenueSummary } from "@/components/app/RevenueSummary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +19,7 @@ import { useDogs, useSettings } from "@/lib/queries";
 import type { DayBoarding, StayRow } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/admin/")({
+  head: () => pageHead("Today and revenue", "Daily boarding attendance and earned revenue at WoofAbode."),
   component: TodayPage,
 });
 
@@ -137,6 +140,7 @@ function TodayPage() {
       ) : null}
 
       {isLoading ? <Loading /> : null}
+      <RevenueSummary />
 
       <section className="mb-8">
         <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">

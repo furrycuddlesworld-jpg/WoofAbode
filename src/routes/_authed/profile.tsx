@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import { useAuth } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 
 export const Route = createFileRoute("/_authed/profile")({
+  head: () => pageHead("My profile", "Manage your WoofAbode contact and emergency details."),
   component: ProfilePage,
 });
 

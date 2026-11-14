@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/page-head";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Pencil, Phone } from "lucide-react";
 import { useState, type ReactNode } from "react";
@@ -15,6 +16,7 @@ import { formatAge, formatDate } from "@/lib/dates";
 import { useDog, useProfiles } from "@/lib/queries";
 
 export const Route = createFileRoute("/_authed/dogs/$dogId")({
+  head: () => pageHead("Dog details", "Dog care, boarding records and individual rates at WoofAbode."),
   component: DogPage,
 });
 
