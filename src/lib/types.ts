@@ -105,6 +105,19 @@ export type Advance = {
   note: string | null;
 };
 
+export type Expense = {
+  id: string;
+  description: string;
+  category: string;
+  service: "all" | "day" | "home";
+  amount: number;
+  incurred_on: string;
+  paid_on: string | null;
+  method: "cash" | "upi" | "bank" | "other";
+  note: string | null;
+  created_at: string;
+};
+
 export type Payment = {
   id: string;
   bill_id: string;

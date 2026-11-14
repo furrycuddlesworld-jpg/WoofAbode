@@ -358,6 +358,45 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string
+          id: string
+          incurred_on: string
+          method: string
+          note: string | null
+          paid_on: string | null
+          service: string
+        }
+        Insert: {
+          amount: number
+          category?: string
+          created_at?: string
+          description: string
+          id?: string
+          incurred_on?: string
+          method?: string
+          note?: string | null
+          paid_on?: string | null
+          service?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          incurred_on?: string
+          method?: string
+          note?: string | null
+          paid_on?: string | null
+          service?: string
+        }
+        Relationships: []
+      }
       health_records: {
         Row: {
           created_at: string

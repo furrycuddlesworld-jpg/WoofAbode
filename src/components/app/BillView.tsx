@@ -72,6 +72,7 @@ export function BillView({ billId }: { billId: string }) {
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["bill", billId] });
     queryClient.invalidateQueries({ queryKey: ["bills"] });
+    queryClient.invalidateQueries({ queryKey: ["revenue"] });
   };
 
   async function regenerate() {
