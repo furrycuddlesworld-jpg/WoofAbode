@@ -91,6 +91,30 @@ describe("rateOn", () => {
 });
 
 describe("calculateBill", () => {
+  it("splits three days at ₹600 and five at ₹700", () => {
+    const bill = calculateBill({ month: "2026-11", dogs: [{ id: "d", name: "Dog" }], rates: [
+      { dog_id: "d", effective_from: "2026-11-01", day_rate: 600, night_rate: null, same_day_rate: null },
+      { dog_id: "d", effective_from: "2026-11-04", day_rate: 700, night_rate: null, same_day_rate: null },
+    ], dayRecords: present("d", Array.from({ length: 8 }, (_, i) => `2026-11-0${i + 1}`)), stays: [] });
+    expect(bill.lines.map(l => [l.quantity, l.rate, l.amount])).toEqual([[3, 600, 1800], [5, 700, 3500]]);
+  });
+  it("keeps an attendance override separate even when it equals the standard rate", () => {
+    const bill = calculateBill({ month: "2026-11", dogs, rates, dayRecords: [{ dog_id: "churro", date: "2026-11-01", status: "present", rate_override: 650 }, ...present("churro", ["2026-11-02"])], stays: [] });
+    expect(bill.lines.map(l => [l.quantity, l.rate, l.special_rate])).toEqual([[1, 650, true], [1, 650, false]]);
+  });
+  it("identifies a dog with any unpriced date even if other dates have charges", () => {
+    const bill = calculateBill({ month: "2026-01", dogs, rates, dayRecords: present("miso", ["2026-01-01"]), stays: [stay({ dog_id: "astro", planned_start: "2025-12-31", planned_end: "2026-01-02" })] });
+    expect(bill.missingRateDogs).toEqual([]);
+    const missing = calculateBill({ month: "2025-12", dogs, rates, dayRecords: present("churro", ["2025-12-01"]), stays: [stay({ dog_id: "astro", planned_start: "2025-12-31", planned_end: "2026-01-02" })] });
+    expect(missing.missingRateDogs).toEqual(["Astro"]);
+    expect(missing.subtotal).toBe(650);
+  });
+  it("uses each night's effective rate within one stay", () => {
+    const bill = calculateBill({ month: "2026-10", dogs, rates, dayRecords: [], stays: [stay({ dog_id: "miso", planned_start: "2026-09-30", planned_end: "2026-10-03" })] });
+    expect(bill.lines.map(l => [l.quantity, l.rate])).toEqual([[2, 1500]]);
+    const september = calculateBill({ month: "2026-09", dogs, rates, dayRecords: [], stays: [stay({ dog_id: "miso", planned_start: "2026-09-30", planned_end: "2026-10-03" })] });
+    expect(september.subtotal).toBe(1200);
+  });
   it("matches the spreadsheet: Churro, 14 days at ₹650 = ₹9,100", () => {
     const days = Array.from({ length: 14 }, (_, i) => `2026-08-${String(i + 1).padStart(2, "0")}`);
     const bill = calculateBill({
