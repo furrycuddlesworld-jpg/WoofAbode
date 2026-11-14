@@ -21,3 +21,7 @@
 # Client monthly charges
 - [x] Show running day, full boarding and total charges on client home and boarding views.
 - [x] Test charges and verify a signed-in client's view.
+
+# Automatic client approval
+- [ ] Automatically assign client access on registration and approve existing waiting clients.
+- [ ] Verify automatic access and admin-only attendance and pricing.
