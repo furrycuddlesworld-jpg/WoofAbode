@@ -17,6 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { dogOwnership } from "@/lib/dog-owner";
+import { rateOn } from "@/lib/billing";
+import { todayIST } from "@/lib/dates";
+import { useRates } from "@/lib/queries";
 import { uploadDogFile, useProfiles } from "@/lib/queries";
 import type { Dog } from "@/lib/types";
 
@@ -40,6 +43,8 @@ const TEXT_FIELDS = [
   "vet_address",
   "owner_id",
   "service_type",
+  "day_boarding_rate",
+  "home_boarding_rate",
 ] as const;
 
 function toForm(dog: Partial<Dog> | null): FormState {
@@ -55,8 +60,9 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
   const { session, isAdmin } = useAuth();
   const queryClient = useQueryClient();
   const { data: profiles = [] } = useProfiles(isAdmin);
+  const { data: rates = [] } = useRates(dog ? [dog.id] : []);
   const [form, setForm] = useState<FormState>(() =>
-    toForm(dog ?? { owner_id: session?.user.id ?? null, service_type: "both" }),
+    toForm(dog ?? { owner_id: session?.user.id ?? null, service_type: "both", day_boarding_rate: isAdmin ? 750 : null, home_boarding_rate: isAdmin ? 1500 : null }),
   );
   const [photo, setPhoto] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -91,7 +97,8 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
       // A cached context session can lag behind token refresh or account changes.
       const { data: identity, error: authError } = await supabase.auth.getUser();
       if (authError) throw new Error("Your sign-in could not be verified. Please sign in again before saving your dog.");
-      const payload = { ...row, ...dogOwnership(identity.user?.id, isAdmin, get("owner_id"), Boolean(dog)) };
+      const rateChanges = isAdmin ? Object.fromEntries((["day_boarding_rate", "home_boarding_rate"] as const).filter(k => get(k) !== "" && (!dog || Number(get(k)) !== Number(dog[k]))).map(k => [k, Number(get(k))])) : {};
+      const payload = { ...row, ...rateChanges, ...dogOwnership(identity.user?.id, isAdmin, get("owner_id"), Boolean(dog)) };
       const res = dog
         ? await supabase.from("dogs").update(payload).eq("id", dog.id).select("*").single()
         : await supabase.from("dogs").insert(payload).select("*").single();
@@ -109,6 +116,8 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
         saved = up.data as Dog;
       }
       await queryClient.invalidateQueries({ queryKey: ["dogs"] });
+      await queryClient.invalidateQueries({ queryKey: ["rates"] });
+      await queryClient.invalidateQueries({ queryKey: ["revenue"] });
       await queryClient.invalidateQueries({ queryKey: ["dog", saved.id] });
       toast.success(`${saved.name} saved`);
       onSaved(saved);
@@ -201,6 +210,19 @@ export function DogForm({ dog, onSaved }: { dog: Dog | null; onSaved: (dog: Dog)
           </Field>
         </div>
       </section>
+
+      {isAdmin ? <section className="space-y-4 border-t pt-4">
+        <h2 className="font-semibold">Rates</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Day boarding (₹ per day)">
+            <Input aria-label="Day boarding rate" type="number" min="0" step="0.01" value={get("day_boarding_rate")} onChange={set("day_boarding_rate")} />
+          </Field>
+          <Field label="Home boarding (₹ per night)">
+            <Input aria-label="Home boarding rate" type="number" min="0" step="0.01" value={get("home_boarding_rate")} onChange={set("home_boarding_rate")} />
+          </Field>
+        </div>
+        {dog && ((dog.service_type !== "home" && rateOn(rates, dog.id, todayIST(), "day_rate") == null) || (dog.service_type !== "day" && rateOn(rates, dog.id, todayIST(), "night_rate") == null)) ? <p className="rounded-md bg-warning/25 p-3 text-sm text-warning-foreground">Set rate for {dog.name} first</p> : null}
+      </section> : null}
 
       <section className="space-y-4 rounded-2xl border bg-card p-4">
         <h2 className="font-semibold">Care notes</h2>
